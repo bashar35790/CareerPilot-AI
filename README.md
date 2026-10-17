@@ -1,4 +1,4 @@
-# CareerPilot AI — Technical Planning Documentation Package
+# CareerPilot AI - Technical Planning Documentation Package
 
 > **Platform:** CareerPilot AI  
 > **Role:** Full-Stack AI-Powered Career Development & Job Alignment Platform  
