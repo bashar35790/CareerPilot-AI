@@ -4,7 +4,7 @@ import { sendSuccess } from '../lib/response';
 const router = Router();
 
 router.get('/health', (_req, res) => {
-  return sendSuccess(res, { status: 'healthy', timestamp: new Date().toISOString() });
+  sendSuccess(res, { status: 'healthy' });
 });
 
 export default router;

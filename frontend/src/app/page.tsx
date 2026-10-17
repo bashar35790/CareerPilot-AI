@@ -7,7 +7,7 @@ export default function Home() {
       <div className="flex items-center gap-3">
         <Compass className="h-10 w-10 text-indigo-600" aria-hidden="true" />
         <h1 className="text-4xl font-bold tracking-tight text-slate-900">
-          CareerPilot AI
+          CareerPilot AI 
         </h1>
       </div>
       <p className="max-w-xl text-lg text-slate-600">
