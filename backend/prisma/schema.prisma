@@ -7,3 +7,93 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum UserRole {
+  USER
+  ADMIN
+
+  @@map("user_role")
+}
+
+enum CareerLevel {
+  ENTRY
+  JUNIOR
+  MID
+  SENIOR
+
+  @@map("career_level")
+}
+
+enum ExperienceLevel {
+  ENTRY
+  JUNIOR
+  MID
+  SENIOR
+  LEAD
+
+  @@map("experience_level")
+}
+
+model User {
+  id           String      @id @default(uuid()) @db.Uuid
+  email        String      @unique @db.VarChar(255)
+  passwordHash String      @map("password_hash") @db.VarChar(255)
+  fullName     String      @map("full_name") @db.VarChar(100)
+  role         UserRole    @default(USER)
+  targetRole   String?     @map("target_role") @db.VarChar(100)
+  careerLevel  CareerLevel @default(ENTRY) @map("career_level")
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  refreshTokens   RefreshToken[]
+  resumes         Resume[]
+  jobDescriptions JobDescription[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash") @db.VarChar(255)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  isRevoked Boolean  @default(false) @map("is_revoked")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_refresh_tokens_user_id")
+  @@map("refresh_tokens")
+}
+
+model Resume {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  title      String   @db.VarChar(150)
+  targetRole String?  @map("target_role") @db.VarChar(100)
+  content    String   @db.Text
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_resumes_user_id")
+  @@index([userId, isPrimary], map: "idx_resumes_user_primary")
+  @@map("resumes")
+}
+
+model JobDescription {
+  id              String          @id @default(uuid()) @db.Uuid
+  userId          String          @map("user_id") @db.Uuid
+  title           String          @db.VarChar(150)
+  company         String          @db.VarChar(150)
+  experienceLevel ExperienceLevel @default(MID) @map("experience_level")
+  rawText         String          @map("raw_text") @db.Text
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_job_descriptions_user_id")
+  @@map("job_descriptions")
+}
