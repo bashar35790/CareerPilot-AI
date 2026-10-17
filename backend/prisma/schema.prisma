@@ -34,6 +34,33 @@ enum ExperienceLevel {
   @@map("experience_level")
 }
 
+enum SkillCategory {
+  LANGUAGE
+  FRAMEWORK
+  DATABASE
+  DEVOPS
+  CONCEPT
+  TOOL
+
+  @@map("skill_category")
+}
+
+enum MatchType {
+  MATCHED
+  MISSING_REQUIRED
+  MISSING_PREFERRED
+
+  @@map("match_type")
+}
+
+enum SkillRelevance {
+  HIGH
+  MEDIUM
+  LOW
+
+  @@map("skill_relevance")
+}
+
 model User {
   id           String      @id @default(uuid()) @db.Uuid
   email        String      @unique @db.VarChar(255)
@@ -48,6 +75,8 @@ model User {
   refreshTokens   RefreshToken[]
   resumes         Resume[]
   jobDescriptions JobDescription[]
+  resumeAnalyses  ResumeAnalysis[]
+  careerRoadmaps  CareerRoadmap[]
 
   @@map("users")
 }
@@ -78,6 +107,8 @@ model Resume {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  analyses ResumeAnalysis[]
+
   @@index([userId], map: "idx_resumes_user_id")
   @@index([userId, isPrimary], map: "idx_resumes_user_primary")
   @@map("resumes")
@@ -94,6 +125,109 @@ model JobDescription {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  analyses ResumeAnalysis[]
+
   @@index([userId], map: "idx_job_descriptions_user_id")
   @@map("job_descriptions")
+}
+
+model ResumeAnalysis {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  resumeId         String   @map("resume_id") @db.Uuid
+  jobDescriptionId String   @map("job_description_id") @db.Uuid
+  overallScore     Int      @map("overall_score") @db.SmallInt
+  skillScore       Int      @map("skill_score") @db.SmallInt
+  experienceScore  Int      @map("experience_score") @db.SmallInt
+  summary          String   @db.Text
+  recommendations  Json
+  modelVersion     String   @map("model_version") @db.VarChar(50)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume         Resume          @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobDescription JobDescription  @relation(fields: [jobDescriptionId], references: [id], onDelete: Cascade)
+  analysisSkills AnalysisSkill[]
+  roadmaps       CareerRoadmap[]
+
+  @@index([userId], map: "idx_resume_analyses_user_id")
+  @@index([resumeId], map: "idx_resume_analyses_resume_id")
+  @@index([jobDescriptionId], map: "idx_resume_analyses_job_description_id")
+  @@index([userId, createdAt], map: "idx_resume_analyses_user_created_at")
+  @@map("resume_analyses")
+}
+
+model Skill {
+  id             String        @id @default(uuid()) @db.Uuid
+  name           String        @unique @db.VarChar(100)
+  normalizedName String        @unique @map("normalized_name") @db.VarChar(100)
+  category       SkillCategory
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  analysisSkills AnalysisSkill[]
+
+  @@index([category], map: "idx_skills_category")
+  @@map("skills")
+}
+
+model AnalysisSkill {
+  id             String         @id @default(uuid()) @db.Uuid
+  analysisId     String         @map("analysis_id") @db.Uuid
+  skillId        String         @map("skill_id") @db.Uuid
+  matchType      MatchType      @map("match_type")
+  relevance      SkillRelevance @default(MEDIUM)
+  contextualNote String?        @map("contextual_note") @db.Text
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  analysis ResumeAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  skill    Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([analysisId, skillId], map: "uq_analysis_skills_analysis_skill")
+  @@index([analysisId], map: "idx_analysis_skills_analysis_id")
+  @@index([skillId], map: "idx_analysis_skills_skill_id")
+  @@index([matchType], map: "idx_analysis_skills_match_type")
+  @@map("analysis_skills")
+}
+
+model CareerRoadmap {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  analysisId     String   @map("analysis_id") @db.Uuid
+  targetRole     String   @map("target_role") @db.VarChar(100)
+  timeframe      String   @db.VarChar(50)
+  totalTasks     Int      @default(0) @map("total_tasks")
+  completedTasks Int      @default(0) @map("completed_tasks")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysis ResumeAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  tasks    RoadmapTask[]
+
+  @@index([userId], map: "idx_career_roadmaps_user_id")
+  @@index([analysisId], map: "idx_career_roadmaps_analysis_id")
+  @@index([userId, createdAt], map: "idx_career_roadmaps_user_created_at")
+  @@map("career_roadmaps")
+}
+
+model RoadmapTask {
+  id          String   @id @default(uuid()) @db.Uuid
+  roadmapId   String   @map("roadmap_id") @db.Uuid
+  phaseNumber Int      @map("phase_number") @db.SmallInt
+  phaseTitle  String   @map("phase_title") @db.VarChar(150)
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  isCompleted Boolean  @default(false) @map("is_completed")
+  orderIndex  Int      @map("order_index") @db.SmallInt
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  roadmap CareerRoadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@index([roadmapId], map: "idx_roadmap_tasks_roadmap_id")
+  @@index([roadmapId, orderIndex], map: "idx_roadmap_tasks_roadmap_order")
+  @@index([roadmapId, phaseNumber], map: "idx_roadmap_tasks_roadmap_phase")
+  @@map("roadmap_tasks")
 }
