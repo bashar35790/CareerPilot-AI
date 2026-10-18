@@ -132,7 +132,7 @@ Scenario: Generating a roadmap and completing a milestone task
 | **Security & Validation** | **10** | HttpOnly signed cookie sessions; refresh token rotation; Zod input schemas; cross-user authorization filters. | `ARCHITECTURE.md`, `API_SPECIFICATION.md` |
 | **AI / ML Feature & Explanation** | **10** | Gemini 2.5 Flash server-side integration; structured JSON schema enforcement; hybrid deterministic + semantic matching; empirical evaluation plan. | `AI_FEATURE.md` |
 | **Code Quality, Testing & Git** | **10** | Strict TypeScript; atomic conventional commits; Vitest unit tests for scoring algorithms; Supertest API integration tests. | `IMPLEMENTATION_PLAN.md` |
-| **Live Review & Technical Defense**| **10** | Structured live demo walkthrough, architecture defense playbook, and readiness for live code changes & debugging tasks. | `README.md #5` |
+| **Live Review & Technical Defense**| **10** | Structured live demo walkthrough, architecture defense playbook, and readiness for live code changes & debugging tasks. | `README.md` §12 |
 
 ---
 

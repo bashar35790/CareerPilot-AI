@@ -322,12 +322,12 @@ Persists tailored learning plans derived from identified skill gaps.
 ## 5. Migration Strategy & Seed Data
 
 ### 5.1 Prisma Migration Workflow
-1. Initial schema definition managed via `prisma/schema.prisma` (to be written during implementation).
-2. Version-controlled migration files generated using `npx prisma migrate dev --name init_schema`.
-3. Production migration execution via `npx prisma migrate deploy` in CI/CD before starting the backend process.
+1. Schema is defined in `prisma/schema.prisma` and applied via a version-controlled migration.
+2. Migration files are generated using `npx prisma migrate dev --name init_schema`.
+3. Production migration execution via `npx prisma migrate deploy` before starting the backend process.
 
 ### 5.2 Deterministic Seeding (`prisma/seed.ts`)
-To ensure predictable local development and live assessment demonstrations, the database seed routine will populate:
-- **Canonical Skill Taxonomy:** Top 50 software engineering skills across languages, frameworks, databases, and DevOps tools.
-- **Demo Users:** Pre-configured demo user accounts with securely pre-hashed passwords for one-click assessment evaluation.
-- **Reference Resume & Job Description Pair:** Pre-loaded realistic Junior Full-Stack developer resume and matching job description to demonstrate immediate end-to-end functionality.
+To ensure predictable local development and live assessment demonstrations, the seed routine (`npm run db:seed`) populates:
+- **Canonical Skill Taxonomy:** 73 software engineering skills across languages, frameworks, databases, DevOps tools, concepts, and tooling (idempotent `upsert` via `syncCanonicalSkills`).
+- **Demo User:** The `demo@careerpilot.internal` reviewer account with a securely pre-hashed password for one-click assessment evaluation.
+- **Reference Resume & Job Description Pair:** A realistic Junior Full-Stack developer resume and matching job description, pre-loaded for the demo account to demonstrate immediate end-to-end functionality.
