@@ -3,11 +3,23 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
+
+  /* Hero-derived brand palette (used site-wide for consistency) */
+  --hero: #000000;
+  --hero-foreground: #ffffff;
+  --hero-muted: #a3a3a3;
+  --accent: #1f469a;
+  --accent-bright: #2563eb;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-hero: var(--hero);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-muted: var(--hero-muted);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-playfair);
@@ -20,14 +32,21 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Glassmorphism utility */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
 .glass-panel {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Shimmer animation for loading states */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Briefcase,
   ChevronDown,
@@ -15,9 +15,9 @@ import {
   Play,
   Sparkles,
   X,
-} from 'lucide-react';
-import { useAuth } from '@/store/auth-context';
-import { useToast } from '@/components/ui';
+} from "lucide-react";
+import { useAuth } from "@/store/auth-context";
+import { useToast } from "@/components/ui";
 
 interface NavItem {
   label: string;
@@ -26,11 +26,11 @@ interface NavItem {
 }
 
 const AUTH_NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Resumes', href: '/resumes', icon: FileText },
-  { label: 'Job Postings', href: '/jobs', icon: Briefcase },
-  { label: 'Gap Analysis', href: '/analysis', icon: Sparkles },
-  { label: 'Roadmaps', href: '/roadmaps', icon: Map },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Resumes", href: "/resumes", icon: FileText },
+  { label: "Job Postings", href: "/jobs", icon: Briefcase },
+  { label: "Gap Analysis", href: "/analysis", icon: Sparkles },
+  { label: "Roadmaps", href: "/roadmaps", icon: Map },
 ];
 
 export function Navbar() {
@@ -45,7 +45,7 @@ export function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isHome = pathname === '/';
+  const isHome = pathname === "/";
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -57,8 +57,8 @@ export function Navbar() {
         setProfileDropdownOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close mobile menu on route change
@@ -70,10 +70,10 @@ export function Navbar() {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success('You have been signed out successfully.');
-      router.push('/login');
+      toast.success("You have been signed out successfully.");
+      router.push("/login");
     } catch {
-      toast.error('Failed to log out. Please try again.');
+      toast.error("Failed to log out. Please try again.");
     }
   };
 
@@ -81,21 +81,21 @@ export function Navbar() {
     setIsDemoLoading(true);
     try {
       await demoLogin();
-      toast.success('Signed in as Demo Reviewer!');
-      router.push('/dashboard');
+      toast.success("Signed in as Demo Reviewer!");
+      router.push("/dashboard");
     } catch {
-      toast.error('Unable to sign in with demo account.');
+      toast.error("Unable to sign in with demo account.");
     } finally {
       setIsDemoLoading(false);
     }
   };
 
   const getInitials = (name?: string) => {
-    if (!name) return 'U';
+    if (!name) return "U";
     return name
-      .split(' ')
+      .split(" ")
       .map((part) => part[0])
-      .join('')
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -103,72 +103,71 @@ export function Navbar() {
   const theme = isHome
     ? {
         header:
-          'absolute top-0 z-40 w-full border-b border-transparent bg-transparent',
-        focusRing: 'focus-visible:ring-white/70',
-        brandText: 'text-white',
-        brandSub: 'text-neutral-400',
-        brandBadge: 'border border-white/10 bg-white/10 text-white/80',
-        navIdle: 'text-neutral-300 hover:bg-white/10 hover:text-white',
-        navActive: 'bg-white/10 text-white font-semibold',
-        iconIdle: 'text-neutral-400',
-        iconActive: 'text-white',
-        skeleton: 'bg-white/10',
+          "absolute top-0 z-40 w-full border-b border-transparent bg-transparent",
+        focusRing: "focus-visible:ring-white/70",
+        brandText: "text-white",
+        brandSub: "text-neutral-400",
+        brandBadge: "border border-white/10 bg-white/10 text-white/80",
+        navIdle: "text-neutral-300 hover:bg-white/10 hover:text-white",
+        navActive: "bg-white/10 text-white font-semibold",
+        iconIdle: "text-neutral-400",
+        iconActive: "text-white",
+        skeleton: "bg-white/10",
         profileBtn:
-          'border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20',
-        profileName: 'text-white',
-        profileSub: 'text-neutral-400',
-        chevron: 'text-neutral-400',
-        chevronOpen: 'rotate-180 text-white',
+          "border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20",
+        profileName: "text-white",
+        profileSub: "text-neutral-400",
+        chevron: "text-neutral-400",
+        chevronOpen: "rotate-180 text-white",
         glass:
-          'border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20',
-        playIcon: 'fill-white text-white',
-        ghost: 'text-neutral-300 hover:bg-white/10 hover:text-white',
-        ghostOutline: 'border-white/20 text-neutral-200 hover:bg-white/10',
-        primary: 'bg-white text-black hover:bg-neutral-200',
-        hamburger: 'text-white hover:bg-white/10',
-        drawer: 'border-white/10 bg-black/95',
-        drawerCard: 'border-white/10 bg-white/5',
-        drawerName: 'text-white',
-        drawerSub: 'text-neutral-400',
-        drawerNavIdle: 'text-neutral-300 hover:bg-white/10',
-        drawerNavActive: 'bg-white/10 text-white font-semibold',
-        logout:
-          'border-white/10 bg-white/5 text-rose-300 hover:bg-white/10',
-        divider: 'border-white/10',
+          "border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20",
+        playIcon: "fill-white text-white",
+        ghost: "text-neutral-300 hover:bg-white/10 hover:text-white",
+        ghostOutline: "border-white/20 text-neutral-200 hover:bg-white/10",
+        primary: "bg-white text-black hover:bg-neutral-200",
+        hamburger: "text-white hover:bg-white/10",
+        drawer: "border-white/10 bg-black/95",
+        drawerCard: "border-white/10 bg-white/5",
+        drawerName: "text-white",
+        drawerSub: "text-neutral-400",
+        drawerNavIdle: "text-neutral-300 hover:bg-white/10",
+        drawerNavActive: "bg-white/10 text-white font-semibold",
+        logout: "border-white/10 bg-white/5 text-rose-300 hover:bg-white/10",
+        divider: "border-white/10",
       }
     : {
         header:
-          'sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/85 backdrop-blur-md',
-        focusRing: 'focus-visible:ring-indigo-500',
-        brandText: 'text-slate-900',
-        brandSub: 'text-slate-500',
-        brandBadge: 'bg-indigo-100 text-indigo-700',
-        navIdle: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-        navActive: 'bg-indigo-50 text-indigo-700 shadow-2xs font-semibold',
-        iconIdle: 'text-slate-400',
-        iconActive: 'text-indigo-600',
-        skeleton: 'bg-slate-100',
+          "sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/85 backdrop-blur-md",
+        focusRing: "focus-visible:ring-indigo-500",
+        brandText: "text-slate-900",
+        brandSub: "text-slate-500",
+        brandBadge: "bg-indigo-100 text-indigo-700",
+        navIdle: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+        navActive: "bg-indigo-50 text-indigo-700 shadow-2xs font-semibold",
+        iconIdle: "text-slate-400",
+        iconActive: "text-indigo-600",
+        skeleton: "bg-slate-100",
         profileBtn:
-          'border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300',
-        profileName: 'text-slate-900',
-        profileSub: 'text-slate-500',
-        chevron: 'text-slate-400',
-        chevronOpen: 'rotate-180 text-indigo-600',
+          "border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300",
+        profileName: "text-slate-900",
+        profileSub: "text-slate-500",
+        chevron: "text-slate-400",
+        chevronOpen: "rotate-180 text-indigo-600",
         glass:
-          'border-indigo-200 bg-indigo-50/70 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300',
-        playIcon: 'fill-indigo-600 text-indigo-600',
-        ghost: 'text-slate-700 hover:text-slate-900 hover:bg-slate-100',
-        ghostOutline: 'border-slate-300 text-slate-700 hover:bg-slate-100',
-        primary: 'bg-indigo-600 text-white hover:bg-indigo-500',
-        hamburger: 'text-slate-600 hover:bg-slate-100',
-        drawer: 'border-slate-200 bg-white',
-        drawerCard: 'border-slate-200/80 bg-slate-50',
-        drawerName: 'text-slate-900',
-        drawerSub: 'text-slate-500',
-        drawerNavIdle: 'text-slate-700 hover:bg-slate-100',
-        drawerNavActive: 'bg-indigo-50 text-indigo-700 font-semibold',
-        logout: 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100',
-        divider: 'border-slate-100',
+          "border-indigo-200 bg-indigo-50/70 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300",
+        playIcon: "fill-indigo-600 text-indigo-600",
+        ghost: "text-slate-700 hover:text-slate-900 hover:bg-slate-100",
+        ghostOutline: "border-slate-300 text-slate-700 hover:bg-slate-100",
+        primary: "bg-indigo-600 text-white hover:bg-indigo-500",
+        hamburger: "text-slate-600 hover:bg-slate-100",
+        drawer: "border-slate-200 bg-white",
+        drawerCard: "border-slate-200/80 bg-slate-50",
+        drawerName: "text-slate-900",
+        drawerSub: "text-slate-500",
+        drawerNavIdle: "text-slate-700 hover:bg-slate-100",
+        drawerNavActive: "bg-indigo-50 text-indigo-700 font-semibold",
+        logout: "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
+        divider: "border-slate-100",
       };
 
   return (
@@ -176,15 +175,17 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link
-          href={isAuthenticated ? '/dashboard' : '/'}
+          href={isAuthenticated ? "/dashboard" : "/"}
           className={`flex items-center gap-2.5 rounded-lg transition-transform hover:scale-[1.01] focus-visible:outline-hidden focus-visible:ring-2 ${theme.focusRing}`}
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-xs">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-xs">
             <Compass className="h-6 w-6" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className={`text-lg font-bold tracking-tight ${theme.brandText}`}>
+              <span
+                className={`text-lg font-bold tracking-tight ${theme.brandText}`}
+              >
                 CareerPilot
               </span>
               <span
@@ -193,7 +194,9 @@ export function Navbar() {
                 AI
               </span>
             </div>
-            <span className={`hidden text-[10px] font-medium sm:block ${theme.brandSub}`}>
+            <span
+              className={`hidden text-[10px] font-medium sm:block ${theme.brandSub}`}
+            >
               Career Alignment Platform
             </span>
           </div>
@@ -206,7 +209,8 @@ export function Navbar() {
               const Icon = item.icon;
               const isActive =
                 pathname === item.href ||
-                (item.href !== '/dashboard' && pathname.startsWith(`${item.href}/`));
+                (item.href !== "/dashboard" &&
+                  pathname.startsWith(`${item.href}/`));
 
               return (
                 <Link
@@ -231,7 +235,9 @@ export function Navbar() {
         {/* Desktop Right Action Area */}
         <div className="hidden md:flex items-center gap-3">
           {isLoading ? (
-            <div className={`h-9 w-24 animate-pulse rounded-lg ${theme.skeleton}`} />
+            <div
+              className={`h-9 w-24 animate-pulse rounded-lg ${theme.skeleton}`}
+            />
           ) : isAuthenticated && user ? (
             /* Authenticated User Menu */
             <div className="relative" ref={dropdownRef}>
@@ -246,16 +252,20 @@ export function Navbar() {
                   {getInitials(user.fullName)}
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className={`text-xs font-semibold leading-tight ${theme.profileName}`}>
+                  <span
+                    className={`text-xs font-semibold leading-tight ${theme.profileName}`}
+                  >
                     {user.fullName}
                   </span>
-                  <span className={`max-w-[110px] truncate text-[10px] leading-tight ${theme.profileSub}`}>
+                  <span
+                    className={`max-w-27.5 truncate text-[10px] leading-tight ${theme.profileSub}`}
+                  >
                     {user.targetRole || user.email}
                   </span>
                 </div>
                 <ChevronDown
                   className={`h-4 w-4 transition-transform duration-200 ${theme.chevron} ${
-                    profileDropdownOpen ? theme.chevronOpen : ''
+                    profileDropdownOpen ? theme.chevronOpen : ""
                   }`}
                 />
               </button>
@@ -264,7 +274,9 @@ export function Navbar() {
               {profileDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-lg ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150 z-50">
                   <div className="border-b border-slate-100 px-3 py-2.5">
-                    <p className="text-xs font-medium text-slate-500">Signed in as</p>
+                    <p className="text-xs font-medium text-slate-500">
+                      Signed in as
+                    </p>
                     <p className="truncate text-sm font-semibold text-slate-900">
                       {user.email}
                     </p>
@@ -272,7 +284,7 @@ export function Navbar() {
                       <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
                         {user.careerLevel} Level
                       </span>
-                      {user.role === 'ADMIN' && (
+                      {user.role === "ADMIN" && (
                         <span className="rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 border border-purple-200">
                           Admin
                         </span>
@@ -330,7 +342,9 @@ export function Navbar() {
                 className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold shadow-2xs transition-all disabled:opacity-50 ${theme.glass}`}
               >
                 <Play className={`h-3 w-3 ${theme.playIcon}`} />
-                <span>{isDemoLoading ? 'Signing in...' : 'One-Click Demo'}</span>
+                <span>
+                  {isDemoLoading ? "Signing in..." : "One-Click Demo"}
+                </span>
               </button>
 
               <Link
@@ -387,15 +401,21 @@ export function Navbar() {
           {isAuthenticated && user ? (
             <div className="space-y-4">
               {/* User Profile Info in Mobile */}
-              <div className={`flex items-center gap-3 rounded-xl border p-3 ${theme.drawerCard}`}>
+              <div
+                className={`flex items-center gap-3 rounded-xl border p-3 ${theme.drawerCard}`}
+              >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
                   {getInitials(user.fullName)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`truncate text-sm font-semibold ${theme.drawerName}`}>
+                  <p
+                    className={`truncate text-sm font-semibold ${theme.drawerName}`}
+                  >
                     {user.fullName}
                   </p>
-                  <p className={`truncate text-xs ${theme.drawerSub}`}>{user.email}</p>
+                  <p className={`truncate text-xs ${theme.drawerSub}`}>
+                    {user.email}
+                  </p>
                 </div>
                 <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
                   {user.careerLevel}
@@ -408,7 +428,8 @@ export function Navbar() {
                   const Icon = item.icon;
                   const isActive =
                     pathname === item.href ||
-                    (item.href !== '/dashboard' && pathname.startsWith(`${item.href}/`));
+                    (item.href !== "/dashboard" &&
+                      pathname.startsWith(`${item.href}/`));
 
                   return (
                     <Link
@@ -451,7 +472,9 @@ export function Navbar() {
                 className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${theme.glass}`}
               >
                 <Play className={`h-4 w-4 ${theme.playIcon}`} />
-                <span>{isDemoLoading ? 'Signing in...' : 'One-Click Demo Login'}</span>
+                <span>
+                  {isDemoLoading ? "Signing in..." : "One-Click Demo Login"}
+                </span>
               </button>
               <Link
                 href="/login"
