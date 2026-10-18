@@ -18,5 +18,9 @@ export const updateJobSchema = createJobSchema
     message: 'At least one field must be provided',
   });
 
+export const jobIdParamSchema = z.object({
+  id: z.string().uuid('Invalid job identifier'),
+});
+
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 export type UpdateJobInput = z.infer<typeof updateJobSchema>;
