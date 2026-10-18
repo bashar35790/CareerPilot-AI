@@ -11,7 +11,7 @@ const PROTECTED_PREFIXES = [
 
 const AUTH_PAGES = ['/login', '/register'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const accessToken = request.cookies.get('access_token')?.value;
