@@ -5,3 +5,4 @@ export * from './users.service';
 export * from './matching.deterministic';
 export * from './matching.reconciliation';
 export * from './analysis.service';
+export * from './roadmap.service';

@@ -6,6 +6,7 @@ export * from './job.schema';
 export * from './user.schema';
 export * from './ai-response.schema';
 export * from './analysis.schema';
+export * from './roadmap.schema';
 
 export const healthCheckSchema = z.object({
   status: z.literal('healthy'),

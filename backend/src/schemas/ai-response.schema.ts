@@ -44,9 +44,27 @@ export const resumeAnalysisResponseSchema = z.object({
   recommendations: z.array(recommendationSchema),
 });
 
+export const roadmapTaskContentSchema = z.object({
+  title: z.string().min(3).max(200),
+  description: z.string().min(10).max(2000),
+});
+
+export const roadmapPhaseSchema = z.object({
+  phaseNumber: z.number().int().min(1).max(10),
+  phaseTitle: z.string().min(3).max(150),
+  tasks: z.array(roadmapTaskContentSchema).min(1).max(10),
+});
+
+export const roadmapGenerationResponseSchema = z.object({
+  phases: z.array(roadmapPhaseSchema).min(1).max(6),
+});
+
 export type SkillCategoryValue = z.infer<typeof skillCategorySchema>;
 export type SkillRelevanceValue = z.infer<typeof skillRelevanceSchema>;
 export type MatchedSkill = z.infer<typeof matchedSkillSchema>;
 export type MissingSkill = z.infer<typeof missingSkillSchema>;
 export type Recommendation = z.infer<typeof recommendationSchema>;
 export type ResumeAnalysisResponse = z.infer<typeof resumeAnalysisResponseSchema>;
+export type RoadmapTaskContent = z.infer<typeof roadmapTaskContentSchema>;
+export type RoadmapPhase = z.infer<typeof roadmapPhaseSchema>;
+export type RoadmapGenerationResponse = z.infer<typeof roadmapGenerationResponseSchema>;
