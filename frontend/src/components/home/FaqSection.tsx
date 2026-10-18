@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useId, useRef, useState } from 'react';
-import Image from 'next/image';
-import type { Variants } from 'motion/react';
-import { motion, useReducedMotion } from 'motion/react';
-import { Minus, Plus } from 'lucide-react';
-import { TimelineAnimation } from '@/components/ui/timeline-animation';
+import { useId, useRef, useState } from "react";
+import Image from "next/image";
+import type { Variants } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
+import { Minus, Plus } from "lucide-react";
+import { TimelineAnimation } from "@/components/ui/timeline-animation";
 
-const LINKEDIN_URL = 'https://www.linkedin.com/';
+const LINKEDIN_URL = "https://www.linkedin.com/in/bashar35790";
 
 type Faq = {
   question: string;
@@ -16,34 +16,34 @@ type Faq = {
 
 const FAQS: Faq[] = [
   {
-    question: 'What exactly does CareerPilot AI do?',
+    question: "What exactly does CareerPilot AI do?",
     answer:
-      'It turns a fuzzy job hunt into a measurable one. Upload your resume, paste a job description, and CareerPilot returns an explainable match score, a breakdown of matched, missing-required, and preferred skills, and concrete recommendations to close the gap.',
+      "It turns a fuzzy job hunt into a measurable one. Upload your resume, paste a job description, and CareerPilot returns an explainable match score, a breakdown of matched, missing-required, and preferred skills, and concrete recommendations to close the gap.",
   },
   {
-    question: 'How is the match score calculated?',
+    question: "How is the match score calculated?",
     answer:
-      'Scores come from a hybrid engine: deterministic skill extraction and weighting run first, then Gemini 2.5 Flash adds structured reasoning for nuance. Because the deterministic layer leads, results stay reproducible and grounded in your actual profile rather than a black box.',
+      "Scores come from a hybrid engine: deterministic skill extraction and weighting run first, then Gemini 2.5 Flash adds structured reasoning for nuance. Because the deterministic layer leads, results stay reproducible and grounded in your actual profile rather than a black box.",
   },
   {
-    question: 'Who is CareerPilot AI built for?',
+    question: "Who is CareerPilot AI built for?",
     answer:
-      'Software engineers, career switchers, and anyone targeting technical roles who wants evidence instead of guesswork. It supports students preparing for a first role as well as experienced developers aiming at senior positions.',
+      "Software engineers, career switchers, and anyone targeting technical roles who wants evidence instead of guesswork. It supports students preparing for a first role as well as experienced developers aiming at senior positions.",
   },
   {
-    question: 'Is my resume data secure?',
+    question: "Is my resume data secure?",
     answer:
-      'Yes. Sessions use HttpOnly cookies, and every resume, match, and roadmap record is tied to your account through relational, access-controlled data models. Nothing is stored in a shared pool.',
+      "Yes. Sessions use HttpOnly cookies, and every resume, match, and roadmap record is tied to your account through relational, access-controlled data models. Nothing is stored in a shared pool.",
   },
   {
-    question: 'Do the career roadmaps actually help?',
+    question: "Do the career roadmaps actually help?",
     answer:
-      'Each identified gap becomes a three-phase milestone plan with checkable tasks. Progress is saved to your account, so the roadmap evolves with you instead of resetting every session.',
+      "Each identified gap becomes a three-phase milestone plan with checkable tasks. Progress is saved to your account, so the roadmap evolves with you instead of resetting every session.",
   },
   {
-    question: 'Can I use it without generating a match first?',
+    question: "Can I use it without generating a match first?",
     answer:
-      'You can manage resumes and job postings independently, but match analysis and roadmaps are most valuable once a target job is linked. Start with one resume and one posting to see the full loop.',
+      "You can manage resumes and job postings independently, but match analysis and roadmaps are most valuable once a target job is linked. Start with one resume and one posting to see the full loop.",
   },
 ];
 
@@ -90,8 +90,8 @@ export function FaqCard({
         id={contentId}
         role="region"
         initial={false}
-        animate={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
-        transition={{ duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}
+        animate={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+        transition={{ duration: reduceMotion ? 0 : 0.2, ease: "easeOut" }}
         className="grid overflow-hidden px-2 sm:px-4"
       >
         <div className="overflow-hidden">
@@ -110,12 +110,12 @@ export function FaqSection() {
 
   const revealVariants: Variants = {
     hidden: reduceMotion
-      ? { opacity: 1, y: 0, filter: 'blur(0px)' }
-      : { opacity: 0, y: 0, filter: 'blur(20px)' },
+      ? { opacity: 1, y: 0, filter: "blur(0px)" }
+      : { opacity: 0, y: 0, filter: "blur(20px)" },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      filter: 'blur(0px)',
+      filter: "blur(0px)",
       transition: { delay: i * (reduceMotion ? 0 : 0.06), duration: 0.5 },
     }),
   };
@@ -163,13 +163,15 @@ export function FaqSection() {
                 <h3 className="text-lg font-semibold text-white sm:text-xl">
                   Abul Bashar
                 </h3>
-                <p className="font-medium text-neutral-400">Founder &amp; CEO</p>
+                <p className="font-medium text-neutral-400">
+                  Founder &amp; CEO
+                </p>
               </div>
             </div>
 
             <p className="my-4 text-base text-neutral-300 sm:my-5 sm:text-lg">
-              &ldquo;I built CareerPilot because job seekers deserve reasons, not
-              just scores.&rdquo;
+              &ldquo;I built CareerPilot because job seekers deserve reasons,
+              not just scores.&rdquo;
             </p>
 
             <a
