@@ -4,6 +4,7 @@ import analysisRoutes from './analysis.routes';
 import authRoutes from './auth.routes';
 import jobRoutes from './jobs.routes';
 import resumeRoutes from './resumes.routes';
+import roadmapRoutes from './roadmap.routes';
 import userRoutes from './users.routes';
 
 const router = Router();
@@ -17,5 +18,6 @@ router.use('/resumes', resumeRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/users', userRoutes);
 router.use('/analyses', analysisRoutes);
+router.use('/roadmaps', roadmapRoutes);
 
 export default router;

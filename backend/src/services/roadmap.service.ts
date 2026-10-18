@@ -3,7 +3,13 @@ import { prisma } from '../lib/prisma';
 import { NotFoundError } from '../lib/errors';
 import { generateCareerRoadmap } from '../lib/gemini';
 import type { RoadmapPhase, SkillCategoryValue, SkillRelevanceValue } from '../schemas/ai-response.schema';
-import type { CreateRoadmapInput, RoadmapTimeframe } from '../schemas/roadmap.schema';
+import type {
+  CreateRoadmapInput,
+  ListRoadmapsQuery,
+  RoadmapTimeframe,
+} from '../schemas/roadmap.schema';
+
+const DEFAULT_PAGE_SIZE = 10;
 
 export const ROADMAP_MODEL_VERSION = 'roadmap-v1:gemini-2.5-flash';
 
@@ -225,4 +231,89 @@ export async function generateRoadmap(userId: string, input: CreateRoadmapInput)
   });
 
   return getRoadmapDetail(userId, roadmapId);
+}
+
+export async function listRoadmaps(userId: string, query: ListRoadmapsQuery) {
+  const page = query.page ?? 1;
+  const limit = query.limit ?? DEFAULT_PAGE_SIZE;
+
+  const [total, records] = await Promise.all([
+    prisma.careerRoadmap.count({ where: { userId } }),
+    prisma.careerRoadmap.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+  ]);
+
+  return {
+    roadmaps: records.map((record) => ({
+      id: record.id,
+      analysisId: record.analysisId,
+      targetRole: record.targetRole,
+      timeframe: record.timeframe,
+      totalTasks: record.totalTasks,
+      completedTasks: record.completedTasks,
+      completionPercentage: computeCompletionPercentage(
+        record.completedTasks,
+        record.totalTasks
+      ),
+      createdAt: record.createdAt.toISOString(),
+      updatedAt: record.updatedAt.toISOString(),
+    })),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+export async function toggleRoadmapTask(
+  userId: string,
+  taskId: string,
+  isCompleted: boolean
+) {
+  const task = await prisma.roadmapTask.findFirst({
+    where: { id: taskId, roadmap: { userId } },
+    select: { id: true, roadmapId: true },
+  });
+
+  if (!task) {
+    throw new NotFoundError('Roadmap task not found');
+  }
+
+  const progress = await prisma.$transaction(async (tx) => {
+    await tx.roadmapTask.update({
+      where: { id: task.id },
+      data: { isCompleted },
+    });
+
+    const [totalTasks, completedTasks] = await Promise.all([
+      tx.roadmapTask.count({ where: { roadmapId: task.roadmapId } }),
+      tx.roadmapTask.count({ where: { roadmapId: task.roadmapId, isCompleted: true } }),
+    ]);
+
+    await tx.careerRoadmap.update({
+      where: { id: task.roadmapId },
+      data: { totalTasks, completedTasks },
+    });
+
+    return { totalTasks, completedTasks };
+  });
+
+  return {
+    taskId: task.id,
+    isCompleted,
+    roadmapProgress: {
+      completedTasks: progress.completedTasks,
+      totalTasks: progress.totalTasks,
+      completionPercentage: computeCompletionPercentage(
+        progress.completedTasks,
+        progress.totalTasks
+      ),
+    },
+  };
 }

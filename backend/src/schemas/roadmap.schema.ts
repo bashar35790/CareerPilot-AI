@@ -20,6 +20,12 @@ export const updateRoadmapTaskSchema = z.object({
   isCompleted: z.boolean(),
 });
 
+export const listRoadmapsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+
 export type RoadmapTimeframe = z.infer<typeof roadmapTimeframeSchema>;
 export type CreateRoadmapInput = z.infer<typeof createRoadmapSchema>;
 export type UpdateRoadmapTaskInput = z.infer<typeof updateRoadmapTaskSchema>;
+export type ListRoadmapsQuery = z.infer<typeof listRoadmapsQuerySchema>;
