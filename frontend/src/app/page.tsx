@@ -15,7 +15,7 @@ export default function Home() {
     <div className="flex flex-1 flex-col">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 sm:py-24 lg:py-28">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.indigo.100),white)] opacity-60" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-100),white)] opacity-60" />
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 mb-6">
@@ -27,7 +27,7 @@ export default function Home() {
           {/* Heading */}
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
             Align Your Resume with Real Job Postings Using{' '}
-            <span className="bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
               Explainable AI
             </span>
           </h1>
