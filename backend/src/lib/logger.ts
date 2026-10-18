@@ -14,6 +14,7 @@ const SENSITIVE_KEYS = new Set([
   'cookie',
   'content',
   'rawtext',
+  'email',
   'secret',
   'apikey',
 ]);
