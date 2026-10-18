@@ -16,5 +16,9 @@ export const updateResumeSchema = createResumeSchema
     message: 'At least one field must be provided',
   });
 
+export const resumeIdParamSchema = z.object({
+  id: z.string().uuid('Invalid resume identifier'),
+});
+
 export type CreateResumeInput = z.infer<typeof createResumeSchema>;
 export type UpdateResumeInput = z.infer<typeof updateResumeSchema>;
