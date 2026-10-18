@@ -16,3 +16,11 @@ export interface ApiResponse<T = unknown> {
     timestamp: string;
   };
 }
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser;
+    }
+  }
+}
