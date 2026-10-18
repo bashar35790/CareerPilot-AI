@@ -1,1 +1,1 @@
-export const controllersPlaceholder = true;
+export * from './auth.controller';

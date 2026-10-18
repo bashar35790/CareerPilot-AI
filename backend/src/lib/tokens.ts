@@ -100,18 +100,23 @@ export function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
+export function setAuthCookies(res: Response, tokens: IssuedSessionTokens): void {
+  res.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, cookieOptions(ACCESS_TOKEN_TTL_MS));
+  res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, cookieOptions(REFRESH_TOKEN_TTL_MS));
+}
+
 export function issueAuthCookies(res: Response, user: AuthenticatedUser): IssuedSessionTokens {
   const accessToken = signAccessToken(user);
   const refreshToken = signRefreshToken(user);
-
-  res.cookie(ACCESS_TOKEN_COOKIE, accessToken, cookieOptions(ACCESS_TOKEN_TTL_MS));
-  res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, cookieOptions(REFRESH_TOKEN_TTL_MS));
-
-  return {
+  const tokens: IssuedSessionTokens = {
     accessToken,
     refreshToken,
     refreshTokenHash: hashToken(refreshToken),
   };
+
+  setAuthCookies(res, tokens);
+
+  return tokens;
 }
 
 export function clearAuthCookies(res: Response): void {

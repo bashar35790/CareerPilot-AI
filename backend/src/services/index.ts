@@ -1,1 +1,1 @@
-export const servicesPlaceholder = true;
+export * from './auth.service';
