@@ -30,7 +30,7 @@ import {
   ExperienceLevel,
   JobDescription,
   Recommendation,
-  Resume,
+  ResumeSummary,
 } from '@/types';
 import { Badge, CardSkeleton, EmptyState, ToastAlert, useToast } from '@/components/ui';
 import { createAnalysisSchema, CreateAnalysisFormData } from '@/schemas/analysis.schema';
@@ -314,7 +314,7 @@ export default function AnalysisView() {
   const prefillResumeId = searchParams.get('resumeId');
   const prefillJobId = searchParams.get('jobId');
 
-  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [resumes, setResumes] = useState<ResumeSummary[]>([]);
   const [isLoadingResumes, setIsLoadingResumes] = useState(true);
 
   const [resumeMode, setResumeMode] = useState<ResumeMode>('saved');
@@ -344,7 +344,7 @@ export default function AnalysisView() {
   const loadResumes = useCallback(async () => {
     setIsLoadingResumes(true);
     try {
-      const response = await api.get<ApiResponse<{ resumes: Resume[] }>>('/resumes');
+      const response = await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>('/resumes');
       if (response.data.success && response.data.data) {
         setResumes(response.data.data.resumes);
       }

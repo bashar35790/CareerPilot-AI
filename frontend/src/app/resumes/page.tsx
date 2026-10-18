@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { api, getApiErrorMessage } from '@/lib/api';
-import { ApiResponse, Resume } from '@/types';
+import { ApiResponse, Resume, ResumeSummary } from '@/types';
 import { Badge, CardSkeleton, EmptyState, useToast } from '@/components/ui';
 import { createResumeSchema } from '@/schemas/resume.schema';
 
@@ -48,11 +48,12 @@ Career Alignment & ATS Match Engine
 export default function ResumesPage() {
   const toast = useToast();
 
-  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [resumes, setResumes] = useState<ResumeSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
+  const [isViewLoading, setIsViewLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form State
@@ -67,7 +68,7 @@ export default function ResumesPage() {
   const fetchResumes = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await api.get<ApiResponse<{ resumes: Resume[] }>>('/resumes');
+      const response = await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>('/resumes');
       if (response.data.success && response.data.data) {
         setResumes(response.data.data.resumes);
       }
@@ -143,13 +144,27 @@ export default function ResumesPage() {
     }
   };
 
-  const handleSetPrimary = async (resume: Resume) => {
+  const handleSetPrimary = async (resume: ResumeSummary) => {
     try {
       await api.put(`/resumes/${resume.id}`, { isPrimary: true });
       toast.success(`"${resume.title}" marked as primary resume.`);
       fetchResumes();
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Failed to update primary status.'));
+    }
+  };
+
+  const handleViewResume = async (id: string) => {
+    setIsViewLoading(true);
+    try {
+      const response = await api.get<ApiResponse<{ resume: Resume }>>(`/resumes/${id}`);
+      if (response.data.success && response.data.data?.resume) {
+        setSelectedResume(response.data.data.resume);
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Failed to load resume.'));
+    } finally {
+      setIsViewLoading(false);
     }
   };
 
@@ -267,10 +282,11 @@ export default function ResumesPage() {
                     {resume.targetRole || 'General Engineering Role'}
                   </p>
 
-                  {/* Content Preview */}
-                  <p className="mt-3 text-xs text-slate-600 line-clamp-3 leading-relaxed bg-slate-50 rounded-lg p-2.5 border border-slate-100 font-mono">
-                    {resume.content}
-                  </p>
+                  {/* Meta */}
+                  <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-lg p-2.5 border border-slate-100">
+                    <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                    <span>Updated {new Date(resume.updatedAt).toLocaleDateString()}</span>
+                  </div>
                 </div>
 
                 {/* Bottom Actions */}
@@ -278,8 +294,9 @@ export default function ResumesPage() {
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => setSelectedResume(resume)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
+                      onClick={() => handleViewResume(resume.id)}
+                      disabled={isViewLoading}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       title="View full resume text"
                     >
                       <Eye className="h-3.5 w-3.5 text-slate-400" />

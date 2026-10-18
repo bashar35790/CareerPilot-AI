@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { api, getApiErrorMessage } from '@/lib/api';
-import { ApiResponse, ExperienceLevel, JobDescription } from '@/types';
+import { ApiResponse, ExperienceLevel, JobDescription, JobDescriptionSummary } from '@/types';
 import { Badge, CardSkeleton, EmptyState, useToast } from '@/components/ui';
 import { createJobSchema } from '@/schemas/job.schema';
 
@@ -50,11 +50,12 @@ const EXPERIENCE_LEVELS: ExperienceLevel[] = ['ENTRY', 'JUNIOR', 'MID', 'SENIOR'
 export default function JobsPage() {
   const toast = useToast();
 
-  const [jobs, setJobs] = useState<JobDescription[]>([]);
+  const [jobs, setJobs] = useState<JobDescriptionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobDescription | null>(null);
+  const [isViewLoading, setIsViewLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form State
@@ -69,7 +70,7 @@ export default function JobsPage() {
   const fetchJobs = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await api.get<ApiResponse<{ jobs: JobDescription[] }>>('/jobs');
+      const response = await api.get<ApiResponse<{ jobs: JobDescriptionSummary[] }>>('/jobs');
       if (response.data.success && response.data.data) {
         setJobs(response.data.data.jobs);
       }
@@ -98,6 +99,20 @@ export default function JobsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setFieldErrors({});
+  };
+
+  const handleViewJob = async (id: string) => {
+    setIsViewLoading(true);
+    try {
+      const response = await api.get<ApiResponse<{ job: JobDescription }>>(`/jobs/${id}`);
+      if (response.data.success && response.data.data?.job) {
+        setSelectedJob(response.data.data.job);
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Failed to load job description.'));
+    } finally {
+      setIsViewLoading(false);
+    }
   };
 
   const handleLoadSample = () => {
@@ -267,10 +282,11 @@ export default function JobsPage() {
                     <span className="truncate">{job.company}</span>
                   </div>
 
-                  {/* Content Preview */}
-                  <p className="mt-3 text-xs text-slate-600 line-clamp-3 leading-relaxed bg-slate-50 rounded-lg p-2.5 border border-slate-100 font-mono">
-                    {job.rawText}
-                  </p>
+                  {/* Meta */}
+                  <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-lg p-2.5 border border-slate-100">
+                    <Eye className="h-3.5 w-3.5 text-slate-400" />
+                    <span>Full description available on View</span>
+                  </div>
                 </div>
 
                 {/* Bottom Actions */}
@@ -278,8 +294,9 @@ export default function JobsPage() {
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => setSelectedJob(job)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
+                      onClick={() => handleViewJob(job.id)}
+                      disabled={isViewLoading}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       title="View full job posting"
                     >
                       <Eye className="h-3.5 w-3.5 text-slate-400" />

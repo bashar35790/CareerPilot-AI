@@ -1,3 +1,12 @@
+export interface ResumeSummary {
+  id: string;
+  title: string;
+  targetRole: string | null;
+  isPrimary: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Resume {
   id: string;
   userId: string;
