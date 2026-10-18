@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { sendSuccess } from '../lib/response';
+import analysisRoutes from './analysis.routes';
 import authRoutes from './auth.routes';
 import jobRoutes from './jobs.routes';
 import resumeRoutes from './resumes.routes';
@@ -15,5 +16,6 @@ router.use('/auth', authRoutes);
 router.use('/resumes', resumeRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/users', userRoutes);
+router.use('/analyses', analysisRoutes);
 
 export default router;

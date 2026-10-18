@@ -4,3 +4,4 @@ export * from './jobs.service';
 export * from './users.service';
 export * from './matching.deterministic';
 export * from './matching.reconciliation';
+export * from './analysis.service';
