@@ -45,7 +45,8 @@ export function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isHome = pathname === "/";
+  const isDarkPage =
+    pathname === "/" || pathname === "/login" || pathname === "/register";
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -100,7 +101,7 @@ export function Navbar() {
       .slice(0, 2);
   };
 
-  const theme = isHome
+  const theme = isDarkPage
     ? {
         header:
           "absolute top-0 z-40 w-full border-b border-transparent bg-transparent",
