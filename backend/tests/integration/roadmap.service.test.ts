@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import app from '../../src/index';
 import { generateCareerRoadmap } from '../../src/lib/gemini';
 import { prisma } from '../../src/lib/prisma';
 import { generateRoadmap, getRoadmapDetail } from '../../src/services/roadmap.service';
