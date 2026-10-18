@@ -133,6 +133,83 @@ describe('score weights & math', () => {
       expect(value).toBeLessThanOrEqual(100);
     }
   });
+
+  it('exposes weights that sum to a full 100%', () => {
+    const total = SCORE_WEIGHTS.skill + SCORE_WEIGHTS.experience + SCORE_WEIGHTS.completeness;
+    expect(total).toBeCloseTo(1, 10);
+  });
+
+  it('rounds the weighted result to the nearest integer', () => {
+    // 0.55*55 + 0.35*35 + 0.10*10 = 43.5 -> 44
+    expect(computeOverallScore(55, 35, 10)).toBe(44);
+    // 0.55*54 + 0.35*54 + 0.10*54 = 54
+    expect(computeOverallScore(54, 54, 54)).toBe(54);
+  });
+
+  it('treats a missing completeness score as a zero contribution', () => {
+    expect(computeOverallScore(100, 100, 0)).toBe(90);
+  });
+
+  it('yields a zero skill score when the job exposes no skills', () => {
+    const emptyDeterministic = {
+      resumeSkills: [],
+      jobSkills: [],
+      matchedSkills: [],
+      missingRequiredCandidates: [],
+      additionalResumeSkills: [],
+      deterministicSkillScore: 0,
+    } as unknown as DeterministicMatchResult;
+    const noSkills = {
+      ...llm,
+      matchedSkills: [],
+      missingRequiredSkills: [],
+      missingPreferredSkills: [],
+    } as unknown as ResumeAnalysisResponse;
+
+    const result = reconcileAnalysis({
+      resumeText: richResume,
+      deterministic: emptyDeterministic,
+      llm: noSkills,
+    });
+
+    expect(result.scores.skillScore).toBe(0);
+    expect(result.stats.requiredTotal).toBe(0);
+    expect(result.scores.overallScore).toBe(35);
+  });
+
+  it('promotes a deterministic gap to matched when the LLM evidences the skill', () => {
+    const llmWithKubernetes = {
+      ...llm,
+      matchedSkills: [
+        ...llm.matchedSkills,
+        {
+          name: 'Kubernetes',
+          category: 'DEVOPS',
+          relevance: 'MEDIUM',
+          evidenceFromResume: 'Operated a managed Kubernetes cluster.',
+        },
+      ],
+    } as unknown as ResumeAnalysisResponse;
+
+    const result = reconcileAnalysis({
+      resumeText: richResume,
+      deterministic,
+      llm: llmWithKubernetes,
+    });
+
+    expect(result.matchedSkills.map((s) => s.name)).toContain('Kubernetes');
+    expect(result.missingRequiredSkills.map((s) => s.name)).not.toContain('Kubernetes');
+    expect(result.skills.find((s) => s.name === 'Kubernetes')?.source).toBe('LLM');
+  });
+
+  it('recomputes the skill score from reconciled counts, not the deterministic estimate', () => {
+    const result = run();
+    const expected = Math.round(
+      (result.stats.matchedTotal / result.stats.requiredTotal) * 100
+    );
+    expect(result.scores.skillScore).toBe(expected);
+    expect(result.scores.skillScore).not.toBe(deterministic.deterministicSkillScore);
+  });
 });
 
 describe('completeness scoring', () => {
