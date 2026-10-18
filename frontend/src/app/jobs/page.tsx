@@ -11,11 +11,22 @@ import {
   Plus,
   Sparkles,
   Trash2,
-  X,
 } from 'lucide-react';
 import { api, getApiErrorMessage } from '@/lib/api';
-import { ApiResponse, ExperienceLevel, JobDescription, JobDescriptionSummary } from '@/types';
-import { Badge, CardSkeleton, EmptyState, useToast } from '@/components/ui';
+import {
+  ApiResponse,
+  ExperienceLevel,
+  JobDescription,
+  JobDescriptionSummary,
+} from '@/types';
+import {
+  Badge,
+  CardSkeleton,
+  ConfirmDialog,
+  EmptyState,
+  Modal,
+  useToast,
+} from '@/components/ui';
 import { createJobSchema } from '@/schemas/job.schema';
 
 const SAMPLE_JOB_TEXT = `FinTech Innovators Inc. - Junior Full-Stack Developer
@@ -47,6 +58,9 @@ PREFERRED QUALIFICATIONS (BONUS)
 
 const EXPERIENCE_LEVELS: ExperienceLevel[] = ['ENTRY', 'JUNIOR', 'MID', 'SENIOR', 'LEAD'];
 
+const inputBase =
+  'block w-full rounded-lg border bg-white/5 px-3.5 py-2 text-sm text-white placeholder:text-neutral-500 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500';
+
 export default function JobsPage() {
   const toast = useToast();
 
@@ -57,6 +71,8 @@ export default function JobsPage() {
   const [selectedJob, setSelectedJob] = useState<JobDescription | null>(null);
   const [isViewLoading, setIsViewLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] =
+    useState<JobDescriptionSummary | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -70,7 +86,8 @@ export default function JobsPage() {
   const fetchJobs = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await api.get<ApiResponse<{ jobs: JobDescriptionSummary[] }>>('/jobs');
+      const response =
+        await api.get<ApiResponse<{ jobs: JobDescriptionSummary[] }>>('/jobs');
       if (response.data.success && response.data.data) {
         setJobs(response.data.data.jobs);
       }
@@ -104,7 +121,9 @@ export default function JobsPage() {
   const handleViewJob = async (id: string) => {
     setIsViewLoading(true);
     try {
-      const response = await api.get<ApiResponse<{ job: JobDescription }>>(`/jobs/${id}`);
+      const response = await api.get<ApiResponse<{ job: JobDescription }>>(
+        `/jobs/${id}`,
+      );
       if (response.data.success && response.data.data?.job) {
         setSelectedJob(response.data.data.job);
       }
@@ -146,7 +165,7 @@ export default function JobsPage() {
     try {
       const response = await api.post<ApiResponse<{ job: JobDescription }>>(
         '/jobs',
-        validationResult.data
+        validationResult.data,
       );
       if (response.data.success && response.data.data?.job) {
         toast.success('Job description saved successfully!');
@@ -160,10 +179,9 @@ export default function JobsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this job description?')) {
-      return;
-    }
+  const handleConfirmDelete = async () => {
+    if (!confirmTarget) return;
+    const id = confirmTarget.id;
 
     setDeletingId(id);
     try {
@@ -172,9 +190,12 @@ export default function JobsPage() {
       if (selectedJob?.id === id) {
         setSelectedJob(null);
       }
+      setConfirmTarget(null);
       fetchJobs();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to delete job description.'));
+      toast.error(
+        getApiErrorMessage(error, 'Failed to delete job description.'),
+      );
     } finally {
       setDeletingId(null);
     }
@@ -199,27 +220,28 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 w-full">
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="font-display text-2xl font-medium tracking-tight text-white sm:text-3xl">
               Target Job Postings
             </h1>
             <Badge variant="matched" size="sm">
               {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'}
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
-            Ingest and store real-world job postings to benchmark your technical resume and identify skill gaps.
+          <p className="mt-1 text-sm text-neutral-400">
+            Ingest and store real-world job postings to benchmark your technical
+            resume and identify skill gaps.
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleOpenCreateModal}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-indigo-500 cursor-pointer"
+          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           <Plus className="h-4 w-4" />
           <span>Add Job Posting</span>
@@ -230,7 +252,7 @@ export default function JobsPage() {
       <div className="mt-8">
         {isLoading ? (
           /* Loading Skeletons */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
@@ -245,7 +267,7 @@ export default function JobsPage() {
               <button
                 type="button"
                 onClick={handleOpenCreateModal}
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 cursor-pointer"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <Plus className="h-4 w-4" />
                 <span>Add First Job Description</span>
@@ -254,60 +276,60 @@ export default function JobsPage() {
           />
         ) : (
           /* Jobs Cards Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {jobs.map((job) => (
               <div
                 key={job.id}
-                className="relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:shadow-md hover:border-slate-300"
+                className="relative flex flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xs transition-all hover:border-white/20 hover:bg-white/10"
               >
                 <div>
                   {/* Top Badges */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="mb-3 flex items-center justify-between gap-2">
                     <Badge variant={getLevelVariant(job.experienceLevel)} size="sm">
                       {job.experienceLevel}
                     </Badge>
 
-                    <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                    <span className="flex items-center gap-1 text-[11px] text-neutral-500">
                       <Calendar className="h-3 w-3" />
                       {new Date(job.createdAt).toLocaleDateString()}
                     </span>
                   </div>
 
                   {/* Title & Company */}
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight line-clamp-1">
+                  <h3 className="line-clamp-1 text-lg font-bold tracking-tight text-white">
                     {job.title}
                   </h3>
-                  <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-slate-600">
-                    <Building2 className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                  <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-neutral-300">
+                    <Building2 className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
                     <span className="truncate">{job.company}</span>
                   </div>
 
                   {/* Meta */}
-                  <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-lg p-2.5 border border-slate-100">
-                    <Eye className="h-3.5 w-3.5 text-slate-400" />
+                  <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 p-2.5 text-xs text-neutral-400">
+                    <Eye className="h-3.5 w-3.5 text-neutral-500" />
                     <span>Full description available on View</span>
                   </div>
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="mt-6 flex items-center justify-between gap-2 border-t border-white/10 pt-4">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleViewJob(job.id)}
                       disabled={isViewLoading}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-white/15 px-2.5 py-1.5 text-xs font-medium text-neutral-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                       title="View full job posting"
                     >
-                      <Eye className="h-3.5 w-3.5 text-slate-400" />
+                      <Eye className="h-3.5 w-3.5 text-neutral-400" />
                       <span>View</span>
                     </button>
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(job.id)}
+                      onClick={() => setConfirmTarget(job)}
                       disabled={deletingId === job.id}
-                      className="inline-flex items-center p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer transition-colors"
+                      className="inline-flex cursor-pointer items-center rounded-lg p-1.5 text-neutral-500 transition-colors hover:bg-rose-500/10 hover:text-rose-400 disabled:opacity-50"
                       title="Delete job posting"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -316,9 +338,9 @@ export default function JobsPage() {
 
                   <Link
                     href={`/analysis?jobId=${job.id}`}
-                    className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1.5 text-xs font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/25"
                   >
-                    <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+                    <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
                     <span>Match Resume</span>
                   </Link>
                 </div>
@@ -329,226 +351,236 @@ export default function JobsPage() {
       </div>
 
       {/* Add Job Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                  <Briefcase className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Add Target Job Posting</h3>
-                  <p className="text-xs text-slate-500">
-                    Paste raw job specifications (min 100, max 20,000 characters).
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="rounded-lg p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Quick Sample Button */}
-            <div className="pt-4 pb-2 flex justify-between items-center">
-              <span className="text-xs text-slate-500">Evaluating the platform?</span>
-              <button
-                type="button"
-                onClick={handleLoadSample}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 cursor-pointer"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span>Load Sample Job Posting</span>
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4 py-2 pr-1" noValidate>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Title */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                    Job Title *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g. Junior Full-Stack Developer"
-                    className={`block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                      fieldErrors.title ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300 bg-white'
-                    }`}
-                  />
-                  {fieldErrors.title && (
-                    <p className="mt-1 text-xs text-rose-600">{fieldErrors.title}</p>
-                  )}
-                </div>
-
-                {/* Company */}
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                    Company Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    placeholder="e.g. Stripe, FinTech Innovators"
-                    className={`block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                      fieldErrors.company ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300 bg-white'
-                    }`}
-                  />
-                  {fieldErrors.company && (
-                    <p className="mt-1 text-xs text-rose-600">{fieldErrors.company}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Experience Level Selector */}
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                  Experience Seniority
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {EXPERIENCE_LEVELS.map((level) => (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, experienceLevel: level })}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
-                        formData.experienceLevel === level
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-2xs'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Content Textarea */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
-                    Job Description Text *
-                  </label>
-                  {/* Live Character Counter */}
-                  <span
-                    className={`text-xs font-mono font-medium ${
-                      charCount === 0
-                        ? 'text-slate-400'
-                        : isContentValid
-                        ? 'text-emerald-600'
-                        : 'text-rose-600'
-                    }`}
-                  >
-                    {charCount.toLocaleString()} / 20,000 characters{' '}
-                    {charCount > 0 && charCount < 100 && '(min 100 required)'}
-                  </span>
-                </div>
-                <textarea
-                  rows={9}
-                  value={formData.rawText}
-                  onChange={(e) => setFormData({ ...formData, rawText: e.target.value })}
-                  placeholder="Paste the full job requirements, tech stack keywords, and responsibilities here..."
-                  className={`block w-full rounded-lg border p-3 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                    fieldErrors.rawText ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300 bg-white'
-                  }`}
-                />
-                {fieldErrors.rawText && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.rawText}</p>
-                )}
-              </div>
-
-              {/* Form Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !isContentValid}
-                  className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 cursor-pointer shadow-xs"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      <span>Saving Job...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="h-3.5 w-3.5" />
-                      <span>Save Job Posting</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+      <Modal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        title="Add Target Job Posting"
+        description="Paste raw job specifications (min 100, max 20,000 characters)."
+        icon={Briefcase}
+        tone="emerald"
+        size="md"
+      >
+        {/* Quick Sample Button */}
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-xs text-neutral-400">
+            Evaluating the platform?
+          </span>
+          <button
+            type="button"
+            onClick={handleLoadSample}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/25"
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>Load Sample Job Posting</span>
+          </button>
         </div>
-      )}
+
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Title */}
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+                Job Title *
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="e.g. Junior Full-Stack Developer"
+                className={`${inputBase} ${
+                  fieldErrors.title
+                    ? 'border-rose-400/60 bg-rose-500/10'
+                    : 'border-white/10'
+                }`}
+              />
+              {fieldErrors.title && (
+                <p className="mt-1 text-xs text-rose-300">{fieldErrors.title}</p>
+              )}
+            </div>
+
+            {/* Company */}
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+                Company Name *
+              </label>
+              <input
+                type="text"
+                value={formData.company}
+                onChange={(e) =>
+                  setFormData({ ...formData, company: e.target.value })
+                }
+                placeholder="e.g. Stripe, FinTech Innovators"
+                className={`${inputBase} ${
+                  fieldErrors.company
+                    ? 'border-rose-400/60 bg-rose-500/10'
+                    : 'border-white/10'
+                }`}
+              />
+              {fieldErrors.company && (
+                <p className="mt-1 text-xs text-rose-300">
+                  {fieldErrors.company}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Experience Level Selector */}
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+              Experience Seniority
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {EXPERIENCE_LEVELS.map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() =>
+                    setFormData({ ...formData, experienceLevel: level })
+                  }
+                  className={`cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    formData.experienceLevel === level
+                      ? 'border-blue-600 bg-blue-600 text-white shadow-2xs'
+                      : 'border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10'
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Content Textarea */}
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+                Job Description Text *
+              </label>
+              {/* Live Character Counter */}
+              <span
+                className={`font-mono text-xs font-medium ${
+                  charCount === 0
+                    ? 'text-neutral-500'
+                    : isContentValid
+                      ? 'text-emerald-400'
+                      : 'text-rose-400'
+                }`}
+              >
+                {charCount.toLocaleString()} / 20,000 characters{' '}
+                {charCount > 0 && charCount < 100 && '(min 100 required)'}
+              </span>
+            </div>
+            <textarea
+              rows={9}
+              value={formData.rawText}
+              onChange={(e) =>
+                setFormData({ ...formData, rawText: e.target.value })
+              }
+              placeholder="Paste the full job requirements, tech stack keywords, and responsibilities here..."
+              className={`${inputBase} font-mono text-xs ${
+                fieldErrors.rawText
+                  ? 'border-rose-400/60 bg-rose-500/10'
+                  : 'border-white/10'
+              }`}
+            />
+            {fieldErrors.rawText && (
+              <p className="mt-1 text-xs text-rose-300">
+                {fieldErrors.rawText}
+              </p>
+            )}
+          </div>
+
+          {/* Form Buttons */}
+          <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4">
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="cursor-pointer rounded-lg border border-white/15 px-4 py-2 text-xs font-semibold text-neutral-200 transition-colors hover:bg-white/10"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || !isContentValid}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Saving Job...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Save Job Posting</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Full Job View Modal */}
-      {selectedJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="relative w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">{selectedJob.title}</h3>
-                <p className="text-xs text-slate-500">
-                  {selectedJob.company} • {selectedJob.experienceLevel} Level •{' '}
-                  {selectedJob.rawText.length.toLocaleString()} characters
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedJob(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+      <Modal
+        open={Boolean(selectedJob)}
+        onClose={() => setSelectedJob(null)}
+        title={selectedJob?.title ?? ''}
+        description={
+          selectedJob
+            ? `${selectedJob.company} • ${selectedJob.experienceLevel} Level • ${selectedJob.rawText.length.toLocaleString()} characters`
+            : undefined
+        }
+        icon={Briefcase}
+        tone="emerald"
+        size="lg"
+        footer={
+          <>
+            {selectedJob && (
+              <Link
+                href={`/analysis?jobId=${selectedJob.id}`}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-700"
               >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto my-4 rounded-xl bg-slate-50 p-4 border border-slate-200">
-              <pre className="whitespace-pre-wrap font-mono text-xs text-slate-800 leading-relaxed">
-                {selectedJob.rawText}
-              </pre>
-            </div>
-
-            <div className="pt-2 flex justify-between items-center">
-              <div className="text-xs text-slate-500">
-                Created on {new Date(selectedJob.createdAt).toLocaleDateString()}
-              </div>
-              <div className="flex gap-2">
-                <Link
-                  href={`/analysis?jobId=${selectedJob.id}`}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>Match a Resume to This Job</span>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setSelectedJob(null)}
-                  className="rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Match a Resume to This Job</span>
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={() => setSelectedJob(null)}
+              className="cursor-pointer rounded-lg border border-white/15 px-3.5 py-1.5 text-xs font-semibold text-neutral-200 transition-colors hover:bg-white/10"
+            >
+              Close
+            </button>
+          </>
+        }
+      >
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-neutral-200">
+            {selectedJob?.rawText}
+          </pre>
         </div>
-      )}
+        {selectedJob && (
+          <p className="mt-3 text-xs text-neutral-500">
+            Created on {new Date(selectedJob.createdAt).toLocaleDateString()}
+          </p>
+        )}
+      </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={Boolean(confirmTarget)}
+        title="Delete this job posting?"
+        description={
+          confirmTarget
+            ? `"${confirmTarget.title}" at ${confirmTarget.company} will be permanently removed. This action cannot be undone.`
+            : undefined
+        }
+        confirmLabel="Delete Job Posting"
+        isConfirming={Boolean(confirmTarget && deletingId === confirmTarget.id)}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setConfirmTarget(null)}
+      />
     </div>
   );
 }

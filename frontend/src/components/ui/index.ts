@@ -3,3 +3,5 @@ export * from './LoadingSkeleton';
 export * from './EmptyState';
 export * from './ToastAlert';
 export * from './Toast';
+export * from './Modal';
+export * from './ConfirmDialog';

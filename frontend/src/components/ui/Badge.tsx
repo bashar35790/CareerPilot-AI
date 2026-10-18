@@ -23,40 +23,40 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<BadgeVariant, { container: string; dot: string }> = {
   default: {
-    container: 'bg-slate-100 text-slate-700 border-slate-200',
-    dot: 'bg-slate-500',
+    container: 'bg-white/10 text-neutral-300 border-white/15',
+    dot: 'bg-neutral-400',
   },
   success: {
-    container: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    dot: 'bg-emerald-500',
+    container: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    dot: 'bg-emerald-400',
   },
   matched: {
-    container: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    dot: 'bg-emerald-500',
+    container: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    dot: 'bg-emerald-400',
   },
   danger: {
-    container: 'bg-rose-50 text-rose-700 border-rose-200',
-    dot: 'bg-rose-500',
+    container: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+    dot: 'bg-rose-400',
   },
   'missing-required': {
-    container: 'bg-rose-50 text-rose-700 border-rose-200',
-    dot: 'bg-rose-500',
+    container: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+    dot: 'bg-rose-400',
   },
   warning: {
-    container: 'bg-amber-50 text-amber-800 border-amber-200',
-    dot: 'bg-amber-500',
+    container: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    dot: 'bg-amber-400',
   },
   'missing-preferred': {
-    container: 'bg-amber-50 text-amber-800 border-amber-200',
-    dot: 'bg-amber-500',
+    container: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    dot: 'bg-amber-400',
   },
   info: {
-    container: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    dot: 'bg-indigo-500',
+    container: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+    dot: 'bg-blue-400',
   },
   purple: {
-    container: 'bg-purple-50 text-purple-700 border-purple-200',
-    dot: 'bg-purple-500',
+    container: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+    dot: 'bg-violet-400',
   },
 };
 

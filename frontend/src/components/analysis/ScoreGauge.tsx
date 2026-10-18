@@ -11,15 +11,15 @@ export interface ScoreColor {
 
 export function getScoreColor(score: number): ScoreColor {
   if (score >= 80) {
-    return { stroke: '#10b981', text: 'text-emerald-600', label: 'Strong match' };
+    return { stroke: '#10b981', text: 'text-emerald-400', label: 'Strong match' };
   }
   if (score >= 60) {
-    return { stroke: '#6366f1', text: 'text-indigo-600', label: 'Good match' };
+    return { stroke: '#2563eb', text: 'text-blue-400', label: 'Good match' };
   }
   if (score >= 40) {
-    return { stroke: '#f59e0b', text: 'text-amber-600', label: 'Partial match' };
+    return { stroke: '#f59e0b', text: 'text-amber-400', label: 'Partial match' };
   }
-  return { stroke: '#f43f5e', text: 'text-rose-600', label: 'Weak match' };
+  return { stroke: '#f43f5e', text: 'text-rose-400', label: 'Weak match' };
 }
 
 export interface ScoreGaugeProps {
@@ -51,7 +51,7 @@ export function ScoreGauge({ score, label = 'Overall Match' }: ScoreGaugeProps) 
               isAnimationActive={false}
             >
               <Cell fill={color.stroke} />
-              <Cell fill="#e2e8f0" />
+              <Cell fill="#27272a" />
             </Pie>
           </PieChart>
         </ResponsiveContainer>
@@ -59,7 +59,7 @@ export function ScoreGauge({ score, label = 'Overall Match' }: ScoreGaugeProps) 
           <span className={`text-4xl font-extrabold tabular-nums ${color.text}`}>
             {clamped}%
           </span>
-          <span className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <span className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
             {label}
           </span>
         </div>

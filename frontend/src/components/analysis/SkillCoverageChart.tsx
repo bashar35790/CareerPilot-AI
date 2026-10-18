@@ -14,7 +14,7 @@ export function SkillCoverageChart({ matched, missingRequired }: SkillCoverageCh
 
   const data =
     total === 0
-      ? [{ name: 'No required skills', value: 1, fill: '#e2e8f0' }]
+      ? [{ name: 'No required skills', value: 1, fill: '#27272a' }]
       : [
           { name: 'Matched', value: matched, fill: '#10b981' },
           { name: 'Missing required', value: missingRequired, fill: '#f43f5e' },
@@ -46,15 +46,15 @@ export function SkillCoverageChart({ matched, missingRequired }: SkillCoverageCh
           </PieChart>
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-extrabold tabular-nums text-slate-900">
+          <span className="text-2xl font-extrabold tabular-nums text-white">
             {coverage}%
           </span>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
             Covered
           </span>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-4 text-xs text-slate-600">
+      <div className="mt-3 flex items-center gap-4 text-xs text-neutral-400">
         <span className="inline-flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
           Matched <span className="font-semibold tabular-nums">{matched}</span>

@@ -45,7 +45,7 @@ export function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isDarkPage =
+  const isImmersive =
     pathname === "/" || pathname === "/login" || pathname === "/register";
 
   // Close dropdown on outside click
@@ -101,7 +101,7 @@ export function Navbar() {
       .slice(0, 2);
   };
 
-  const theme = isDarkPage
+  const theme = isImmersive
     ? {
         header:
           "absolute top-0 z-40 w-full border-b border-transparent bg-transparent",
@@ -138,37 +138,37 @@ export function Navbar() {
       }
     : {
         header:
-          "sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/85 backdrop-blur-md",
-        focusRing: "focus-visible:ring-indigo-500",
-        brandText: "text-slate-900",
-        brandSub: "text-slate-500",
-        brandBadge: "bg-indigo-100 text-indigo-700",
-        navIdle: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-        navActive: "bg-indigo-50 text-indigo-700 shadow-2xs font-semibold",
-        iconIdle: "text-slate-400",
-        iconActive: "text-indigo-600",
-        skeleton: "bg-slate-100",
+          "sticky top-0 z-40 w-full border-b border-white/10 bg-black/80 backdrop-blur-md",
+        focusRing: "focus-visible:ring-blue-500",
+        brandText: "text-white",
+        brandSub: "text-neutral-400",
+        brandBadge: "border border-white/10 bg-white/10 text-white/80",
+        navIdle: "text-neutral-300 hover:bg-white/10 hover:text-white",
+        navActive: "bg-white/10 text-white shadow-2xs font-semibold",
+        iconIdle: "text-neutral-400",
+        iconActive: "text-blue-400",
+        skeleton: "bg-white/10",
         profileBtn:
-          "border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300",
-        profileName: "text-slate-900",
-        profileSub: "text-slate-500",
-        chevron: "text-slate-400",
-        chevronOpen: "rotate-180 text-indigo-600",
+          "border-white/15 bg-white/5 text-white hover:bg-white/10",
+        profileName: "text-white",
+        profileSub: "text-neutral-400",
+        chevron: "text-neutral-400",
+        chevronOpen: "rotate-180 text-blue-400",
         glass:
-          "border-indigo-200 bg-indigo-50/70 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300",
-        playIcon: "fill-indigo-600 text-indigo-600",
-        ghost: "text-slate-700 hover:text-slate-900 hover:bg-slate-100",
-        ghostOutline: "border-slate-300 text-slate-700 hover:bg-slate-100",
-        primary: "bg-indigo-600 text-white hover:bg-indigo-500",
-        hamburger: "text-slate-600 hover:bg-slate-100",
-        drawer: "border-slate-200 bg-white",
-        drawerCard: "border-slate-200/80 bg-slate-50",
-        drawerName: "text-slate-900",
-        drawerSub: "text-slate-500",
-        drawerNavIdle: "text-slate-700 hover:bg-slate-100",
-        drawerNavActive: "bg-indigo-50 text-indigo-700 font-semibold",
-        logout: "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
-        divider: "border-slate-100",
+          "border-blue-500/40 bg-blue-600/20 text-blue-200 hover:bg-blue-600/30",
+        playIcon: "fill-blue-200 text-blue-200",
+        ghost: "text-neutral-300 hover:bg-white/10 hover:text-white",
+        ghostOutline: "border-white/15 text-neutral-200 hover:bg-white/10",
+        primary: "bg-blue-600 text-white hover:bg-blue-700",
+        hamburger: "text-white hover:bg-white/10",
+        drawer: "border-white/10 bg-black/95",
+        drawerCard: "border-white/10 bg-white/5",
+        drawerName: "text-white",
+        drawerSub: "text-neutral-400",
+        drawerNavIdle: "text-neutral-300 hover:bg-white/10",
+        drawerNavActive: "bg-white/10 text-white font-semibold",
+        logout: "border-white/10 bg-white/5 text-rose-300 hover:bg-white/10",
+        divider: "border-white/10",
       };
 
   return (
@@ -179,7 +179,7 @@ export function Navbar() {
           href={isAuthenticated ? "/dashboard" : "/"}
           className={`flex items-center gap-2.5 rounded-lg transition-transform hover:scale-[1.01] focus-visible:outline-hidden focus-visible:ring-2 ${theme.focusRing}`}
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-xs">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-600 shadow-xs">
             <Compass className="h-6 w-6" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
@@ -249,7 +249,7 @@ export function Navbar() {
                 aria-expanded={profileDropdownOpen}
                 aria-haspopup="true"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white shadow-xs">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white shadow-xs">
                   {getInitials(user.fullName)}
                 </div>
                 <div className="flex flex-col text-left">
@@ -273,20 +273,20 @@ export function Navbar() {
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-lg ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150 z-50">
-                  <div className="border-b border-slate-100 px-3 py-2.5">
-                    <p className="text-xs font-medium text-slate-500">
+                <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-2xl border border-white/10 bg-neutral-900 p-2 shadow-lg ring-1 ring-white/10 animate-in fade-in zoom-in-95 duration-150 z-50">
+                  <div className="border-b border-white/10 px-3 py-2.5">
+                    <p className="text-xs font-medium text-neutral-500">
                       Signed in as
                     </p>
-                    <p className="truncate text-sm font-semibold text-slate-900">
+                    <p className="truncate text-sm font-semibold text-white">
                       {user.email}
                     </p>
                     <div className="mt-1 flex items-center gap-1.5">
-                      <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+                      <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
                         {user.careerLevel} Level
                       </span>
                       {user.role === "ADMIN" && (
-                        <span className="rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-semibold text-purple-700 border border-purple-200">
+                        <span className="rounded-md border border-violet-500/30 bg-violet-500/15 px-2 py-0.5 text-[10px] font-semibold text-violet-300">
                           Admin
                         </span>
                       )}
@@ -297,34 +297,34 @@ export function Navbar() {
                     <Link
                       href="/dashboard"
                       onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-indigo-600"
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5 hover:text-blue-400"
                     >
-                      <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                      <LayoutDashboard className="h-4 w-4 text-neutral-500" />
                       <span>Dashboard & Stats</span>
                     </Link>
                     <Link
                       href="/resumes"
                       onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-indigo-600"
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5 hover:text-blue-400"
                     >
-                      <FileText className="h-4 w-4 text-slate-400" />
+                      <FileText className="h-4 w-4 text-neutral-500" />
                       <span>Manage Resumes</span>
                     </Link>
                     <Link
                       href="/analysis"
                       onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-indigo-600"
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5 hover:text-blue-400"
                     >
-                      <Sparkles className="h-4 w-4 text-slate-400" />
+                      <Sparkles className="h-4 w-4 text-neutral-500" />
                       <span>Match Analysis</span>
                     </Link>
                   </div>
 
-                  <div className="border-t border-slate-100 pt-1">
+                  <div className="border-t border-white/10 pt-1">
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50"
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-rose-400 transition-colors hover:bg-rose-500/10"
                     >
                       <LogOut className="h-4 w-4 text-rose-500" />
                       <span>Sign out</span>
@@ -405,7 +405,7 @@ export function Navbar() {
               <div
                 className={`flex items-center gap-3 rounded-xl border p-3 ${theme.drawerCard}`}
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
                   {getInitials(user.fullName)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -418,7 +418,7 @@ export function Navbar() {
                     {user.email}
                   </p>
                 </div>
-                <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
+                <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
                   {user.careerLevel}
                 </span>
               </div>

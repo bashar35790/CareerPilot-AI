@@ -20,9 +20,9 @@ export function ScoreBreakdownChart({
   experienceScore,
 }: ScoreBreakdownChartProps) {
   const data = [
-    { name: 'Overall', value: clamp(overallScore), fill: '#6366f1' },
+    { name: 'Overall', value: clamp(overallScore), fill: '#2563eb' },
     { name: 'Skill Match', value: clamp(skillScore), fill: '#10b981' },
-    { name: 'Experience', value: clamp(experienceScore), fill: '#8b5cf6' },
+    { name: 'Experience', value: clamp(experienceScore), fill: '#7c3aed' },
   ];
 
   return (
@@ -40,7 +40,7 @@ export function ScoreBreakdownChart({
             width={88}
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 12, fill: '#475569' }}
+            tick={{ fontSize: 12, fill: '#a1a1aa' }}
           />
           <Bar dataKey="value" barSize={20} isAnimationActive={false} radius={6}>
             {data.map((entry) => (
@@ -49,7 +49,7 @@ export function ScoreBreakdownChart({
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-400">
         {data.map((entry) => (
           <span key={entry.name} className="inline-flex items-center gap-1.5">
             <span

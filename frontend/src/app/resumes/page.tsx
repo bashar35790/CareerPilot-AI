@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import React, { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Calendar,
   Check,
@@ -11,12 +11,18 @@ import {
   Sparkles,
   Star,
   Trash2,
-  X,
-} from "lucide-react";
-import { api, getApiErrorMessage } from "@/lib/api";
-import { ApiResponse, Resume, ResumeSummary } from "@/types";
-import { Badge, CardSkeleton, EmptyState, useToast } from "@/components/ui";
-import { createResumeSchema } from "@/schemas/resume.schema";
+} from 'lucide-react';
+import { api, getApiErrorMessage } from '@/lib/api';
+import { ApiResponse, Resume, ResumeSummary } from '@/types';
+import {
+  Badge,
+  CardSkeleton,
+  ConfirmDialog,
+  EmptyState,
+  Modal,
+  useToast,
+} from '@/components/ui';
+import { createResumeSchema } from '@/schemas/resume.schema';
 
 const SAMPLE_RESUME_TEXT = `ALEX DEVELOPER
 Full-Stack Software Engineer
@@ -45,6 +51,9 @@ Career Alignment & ATS Match Engine
 - Integrated Google Gemini 2.5 Flash for semantic qualification extraction and ATS keyword scoring.
 - Implemented automated Vitest test suite achieving 92% coverage across business logic services.`;
 
+const inputBase =
+  'block w-full rounded-lg border bg-white/5 px-3.5 py-2 text-sm text-white placeholder:text-neutral-500 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500';
+
 export default function ResumesPage() {
   const toast = useToast();
 
@@ -55,12 +64,13 @@ export default function ResumesPage() {
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [isViewLoading, setIsViewLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ResumeSummary | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
-    title: "",
-    targetRole: "",
-    content: "",
+    title: '',
+    targetRole: '',
+    content: '',
     isPrimary: false,
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -69,12 +79,12 @@ export default function ResumesPage() {
     try {
       setIsLoading(true);
       const response =
-        await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>("/resumes");
+        await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>('/resumes');
       if (response.data.success && response.data.data) {
         setResumes(response.data.data.resumes);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Failed to load resumes."));
+      toast.error(getApiErrorMessage(error, 'Failed to load resumes.'));
     } finally {
       setIsLoading(false);
     }
@@ -86,9 +96,9 @@ export default function ResumesPage() {
 
   const handleOpenCreateModal = () => {
     setFormData({
-      title: "",
-      targetRole: "",
-      content: "",
+      title: '',
+      targetRole: '',
+      content: '',
       isPrimary: resumes.length === 0, // Default to primary if first resume
     });
     setFieldErrors({});
@@ -102,8 +112,8 @@ export default function ResumesPage() {
 
   const handleLoadSample = () => {
     setFormData({
-      title: "Full-Stack Developer Resume",
-      targetRole: "Junior Full-Stack Engineer",
+      title: 'Full-Stack Developer Resume',
+      targetRole: 'Junior Full-Stack Engineer',
       content: SAMPLE_RESUME_TEXT,
       isPrimary: resumes.length === 0,
     });
@@ -130,16 +140,16 @@ export default function ResumesPage() {
     setIsSubmitting(true);
     try {
       const response = await api.post<ApiResponse<{ resume: Resume }>>(
-        "/resumes",
+        '/resumes',
         validationResult.data,
       );
       if (response.data.success && response.data.data?.resume) {
-        toast.success("Resume saved successfully!");
+        toast.success('Resume saved successfully!');
         handleCloseModal();
         fetchResumes();
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Failed to save resume."));
+      toast.error(getApiErrorMessage(error, 'Failed to save resume.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -152,7 +162,7 @@ export default function ResumesPage() {
       fetchResumes();
     } catch (error) {
       toast.error(
-        getApiErrorMessage(error, "Failed to update primary status."),
+        getApiErrorMessage(error, 'Failed to update primary status.'),
       );
     }
   };
@@ -167,27 +177,27 @@ export default function ResumesPage() {
         setSelectedResume(response.data.data.resume);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Failed to load resume."));
+      toast.error(getApiErrorMessage(error, 'Failed to load resume.'));
     } finally {
       setIsViewLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this resume?")) {
-      return;
-    }
+  const handleConfirmDelete = async () => {
+    if (!confirmTarget) return;
+    const id = confirmTarget.id;
 
     setDeletingId(id);
     try {
       await api.delete(`/resumes/${id}`);
-      toast.success("Resume deleted successfully.");
+      toast.success('Resume deleted successfully.');
       if (selectedResume?.id === id) {
         setSelectedResume(null);
       }
+      setConfirmTarget(null);
       fetchResumes();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Failed to delete resume."));
+      toast.error(getApiErrorMessage(error, 'Failed to delete resume.'));
     } finally {
       setDeletingId(null);
     }
@@ -197,19 +207,19 @@ export default function ResumesPage() {
   const isContentValid = charCount >= 100 && charCount <= 20000;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 w-full">
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="font-display text-2xl font-medium tracking-tight text-white sm:text-3xl">
               Resume Management
             </h1>
             <Badge variant="info" size="sm">
-              {resumes.length} {resumes.length === 1 ? "Resume" : "Resumes"}
+              {resumes.length} {resumes.length === 1 ? 'Resume' : 'Resumes'}
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-neutral-400">
             Create, manage, and benchmark your engineering resumes against
             target job postings.
           </p>
@@ -218,7 +228,7 @@ export default function ResumesPage() {
         <button
           type="button"
           onClick={handleOpenCreateModal}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-all hover:bg-indigo-500 cursor-pointer"
+          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           <Plus className="h-4 w-4" />
           <span>Add Resume</span>
@@ -229,7 +239,7 @@ export default function ResumesPage() {
       <div className="mt-8">
         {isLoading ? (
           /* Loading Skeletons */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
@@ -244,7 +254,7 @@ export default function ResumesPage() {
               <button
                 type="button"
                 onClick={handleOpenCreateModal}
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 cursor-pointer"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <Plus className="h-4 w-4" />
                 <span>Create First Resume</span>
@@ -253,44 +263,44 @@ export default function ResumesPage() {
           />
         ) : (
           /* Resumes Cards Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {resumes.map((resume) => (
               <div
                 key={resume.id}
-                className={`relative flex flex-col justify-between rounded-2xl border bg-white p-6 shadow-xs transition-all hover:shadow-md ${
+                className={`relative flex flex-col justify-between rounded-2xl border bg-white/5 p-6 shadow-xs transition-all hover:bg-white/10 ${
                   resume.isPrimary
-                    ? "border-indigo-300 ring-2 ring-indigo-500/10"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? 'border-blue-500/40 ring-2 ring-blue-500/20'
+                    : 'border-white/10 hover:border-white/20'
                 }`}
               >
                 <div>
                   {/* Top Badges */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="mb-3 flex items-center justify-between gap-2">
                     {resume.isPrimary ? (
                       <Badge variant="info" size="sm" dot>
                         Primary Resume
                       </Badge>
                     ) : (
-                      <span className="text-xs text-slate-400">Secondary</span>
+                      <span className="text-xs text-neutral-500">Secondary</span>
                     )}
 
-                    <span className="flex items-center gap-1 text-[11px] text-slate-400">
+                    <span className="flex items-center gap-1 text-[11px] text-neutral-500">
                       <Calendar className="h-3 w-3" />
                       {new Date(resume.createdAt).toLocaleDateString()}
                     </span>
                   </div>
 
                   {/* Title & Role */}
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight line-clamp-1">
+                  <h3 className="line-clamp-1 text-lg font-bold tracking-tight text-white">
                     {resume.title}
                   </h3>
-                  <p className="mt-0.5 text-xs font-medium text-slate-500 line-clamp-1">
-                    {resume.targetRole || "General Engineering Role"}
+                  <p className="mt-0.5 line-clamp-1 text-xs font-medium text-neutral-400">
+                    {resume.targetRole || 'General Engineering Role'}
                   </p>
 
                   {/* Meta */}
-                  <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-lg p-2.5 border border-slate-100">
-                    <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                  <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 p-2.5 text-xs text-neutral-400">
+                    <Calendar className="h-3.5 w-3.5 text-neutral-500" />
                     <span>
                       Updated {new Date(resume.updatedAt).toLocaleDateString()}
                     </span>
@@ -298,16 +308,16 @@ export default function ResumesPage() {
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="mt-6 flex items-center justify-between gap-2 border-t border-white/10 pt-4">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleViewResume(resume.id)}
                       disabled={isViewLoading}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-white/15 px-2.5 py-1.5 text-xs font-medium text-neutral-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                       title="View full resume text"
                     >
-                      <Eye className="h-3.5 w-3.5 text-slate-400" />
+                      <Eye className="h-3.5 w-3.5 text-neutral-400" />
                       <span>View</span>
                     </button>
 
@@ -315,19 +325,19 @@ export default function ResumesPage() {
                       <button
                         type="button"
                         onClick={() => handleSetPrimary(resume)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 cursor-pointer"
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-white/15 px-2.5 py-1.5 text-xs font-medium text-neutral-300 transition-colors hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-500/40"
                         title="Set as primary resume"
                       >
-                        <Star className="h-3.5 w-3.5 text-slate-400" />
+                        <Star className="h-3.5 w-3.5 text-neutral-400" />
                         <span>Primary</span>
                       </button>
                     )}
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(resume.id)}
+                      onClick={() => setConfirmTarget(resume)}
                       disabled={deletingId === resume.id}
-                      className="inline-flex items-center p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer transition-colors"
+                      className="inline-flex cursor-pointer items-center rounded-lg p-1.5 text-neutral-500 transition-colors hover:bg-rose-500/10 hover:text-rose-400 disabled:opacity-50"
                       title="Delete resume"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -336,9 +346,9 @@ export default function ResumesPage() {
 
                   <Link
                     href={`/analysis?resumeId=${resume.id}`}
-                    className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 border border-indigo-200 px-2.5 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-600/20 px-2.5 py-1.5 text-xs font-semibold text-blue-200 transition-colors hover:bg-blue-600/30"
                   >
-                    <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
+                    <Sparkles className="h-3.5 w-3.5 text-blue-400" />
                     <span>Analyze</span>
                   </Link>
                 </div>
@@ -349,244 +359,222 @@ export default function ResumesPage() {
       </div>
 
       {/* Create Resume Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Add New Resume
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Paste or type your resume content (min 100, max 20,000
-                    characters).
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="rounded-lg p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Quick Sample Button */}
-            <div className="pt-4 pb-2 flex justify-between items-center">
-              <span className="text-xs text-slate-500">
-                Need a starting point?
-              </span>
-              <button
-                type="button"
-                onClick={handleLoadSample}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-200 cursor-pointer"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span>Load Sample Template</span>
-              </button>
-            </div>
-
-            {/* Form */}
-            <form
-              onSubmit={handleSubmit}
-              className="flex-1 overflow-y-auto space-y-4 p-2"
-              noValidate
-            >
-              {/* Title */}
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                  Resume Title *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  placeholder="e.g. Full-Stack Software Engineer CV"
-                  className={`block w-full rounded-lg border px-3.5 py-2 text-sm placeholder:text-slate-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                    fieldErrors.title
-                      ? "border-rose-300 bg-rose-50/30"
-                      : "border-slate-300 bg-white"
-                  }`}
-                />
-                {fieldErrors.title && (
-                  <p className="mt-1 text-xs text-rose-600">
-                    {fieldErrors.title}
-                  </p>
-                )}
-              </div>
-
-              {/* Target Role */}
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                  Target Role{" "}
-                  <span className="text-slate-400 font-normal lowercase">
-                    (optional)
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.targetRole}
-                  onChange={(e) =>
-                    setFormData({ ...formData, targetRole: e.target.value })
-                  }
-                  placeholder="e.g. Junior Backend Engineer"
-                  className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              {/* Content Textarea */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
-                    Resume Content *
-                  </label>
-                  {/* Live Character Counter */}
-                  <span
-                    className={`text-xs font-mono font-medium ${
-                      charCount === 0
-                        ? "text-slate-400"
-                        : isContentValid
-                          ? "text-emerald-600"
-                          : "text-rose-600"
-                    }`}
-                  >
-                    {charCount.toLocaleString()} / 20,000 characters{" "}
-                    {charCount > 0 && charCount < 100 && "(min 100 required)"}
-                  </span>
-                </div>
-                <textarea
-                  rows={9}
-                  value={formData.content}
-                  onChange={(e) =>
-                    setFormData({ ...formData, content: e.target.value })
-                  }
-                  placeholder="Paste your plain-text or Markdown resume here (e.g. Summary, Skills, Work Experience, Projects)..."
-                  className={`block w-full rounded-lg border p-3 font-mono text-xs placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                    fieldErrors.content
-                      ? "border-rose-300 bg-rose-50/30"
-                      : "border-slate-300 bg-white"
-                  }`}
-                />
-                {fieldErrors.content && (
-                  <p className="mt-1 text-xs text-rose-600">
-                    {fieldErrors.content}
-                  </p>
-                )}
-              </div>
-
-              {/* Set Primary Checkbox */}
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  id="isPrimary"
-                  type="checkbox"
-                  checked={formData.isPrimary}
-                  onChange={(e) =>
-                    setFormData({ ...formData, isPrimary: e.target.checked })
-                  }
-                  className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <label
-                  htmlFor="isPrimary"
-                  className="text-xs font-medium text-slate-700 cursor-pointer"
-                >
-                  Set as my primary resume for evaluations
-                </label>
-              </div>
-
-              {/* Form Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !isContentValid}
-                  className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 cursor-pointer shadow-xs"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      <span>Saving Resume...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="h-3.5 w-3.5" />
-                      <span>Save Resume</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+      <Modal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        title="Add New Resume"
+        description="Paste or type your resume content (min 100, max 20,000 characters)."
+        icon={FileText}
+        tone="blue"
+        size="md"
+      >
+        {/* Quick Sample Button */}
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-xs text-neutral-400">
+            Need a starting point?
+          </span>
+          <button
+            type="button"
+            onClick={handleLoadSample}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-blue-500/40 bg-blue-600/20 px-2.5 py-1 text-xs font-semibold text-blue-200 transition-colors hover:bg-blue-600/30"
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>Load Sample Template</span>
+          </button>
         </div>
-      )}
+
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          {/* Title */}
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+              Resume Title *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              placeholder="e.g. Full-Stack Software Engineer CV"
+              className={`${inputBase} ${
+                fieldErrors.title
+                  ? 'border-rose-400/60 bg-rose-500/10'
+                  : 'border-white/10'
+              }`}
+            />
+            {fieldErrors.title && (
+              <p className="mt-1 text-xs text-rose-300">{fieldErrors.title}</p>
+            )}
+          </div>
+
+          {/* Target Role */}
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+              Target Role{' '}
+              <span className="font-normal lowercase text-neutral-500">
+                (optional)
+              </span>
+            </label>
+            <input
+              type="text"
+              value={formData.targetRole}
+              onChange={(e) =>
+                setFormData({ ...formData, targetRole: e.target.value })
+              }
+              placeholder="e.g. Junior Backend Engineer"
+              className={`${inputBase} border-white/10`}
+            />
+          </div>
+
+          {/* Content Textarea */}
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300">
+                Resume Content *
+              </label>
+              {/* Live Character Counter */}
+              <span
+                className={`font-mono text-xs font-medium ${
+                  charCount === 0
+                    ? 'text-neutral-500'
+                    : isContentValid
+                      ? 'text-emerald-400'
+                      : 'text-rose-400'
+                }`}
+              >
+                {charCount.toLocaleString()} / 20,000 characters{' '}
+                {charCount > 0 && charCount < 100 && '(min 100 required)'}
+              </span>
+            </div>
+            <textarea
+              rows={9}
+              value={formData.content}
+              onChange={(e) =>
+                setFormData({ ...formData, content: e.target.value })
+              }
+              placeholder="Paste your plain-text or Markdown resume here (e.g. Summary, Skills, Work Experience, Projects)..."
+              className={`${inputBase} font-mono text-xs ${
+                fieldErrors.content
+                  ? 'border-rose-400/60 bg-rose-500/10'
+                  : 'border-white/10'
+              }`}
+            />
+            {fieldErrors.content && (
+              <p className="mt-1 text-xs text-rose-300">
+                {fieldErrors.content}
+              </p>
+            )}
+          </div>
+
+          {/* Set Primary Checkbox */}
+          <div className="flex items-center gap-2 pt-1">
+            <input
+              id="isPrimary"
+              type="checkbox"
+              checked={formData.isPrimary}
+              onChange={(e) =>
+                setFormData({ ...formData, isPrimary: e.target.checked })
+              }
+              className="h-4 w-4 rounded border-white/20 bg-white/5 accent-blue-600"
+            />
+            <label
+              htmlFor="isPrimary"
+              className="cursor-pointer text-xs font-medium text-neutral-300"
+            >
+              Set as my primary resume for evaluations
+            </label>
+          </div>
+
+          {/* Form Buttons */}
+          <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4">
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="cursor-pointer rounded-lg border border-white/15 px-4 py-2 text-xs font-semibold text-neutral-200 transition-colors hover:bg-white/10"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || !isContentValid}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Saving Resume...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Save Resume</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Full Resume View Modal */}
-      {selectedResume && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="relative w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  {selectedResume.title}
-                </h3>
-                <p className="text-xs text-slate-500">
-                  {selectedResume.targetRole || "Engineering Candidate"} •{" "}
-                  {selectedResume.content.length.toLocaleString()} characters
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedResume(null)}
-                className="rounded-lg p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+      <Modal
+        open={Boolean(selectedResume)}
+        onClose={() => setSelectedResume(null)}
+        title={selectedResume?.title ?? ''}
+        description={
+          selectedResume
+            ? `${selectedResume.targetRole || 'Engineering Candidate'} • ${selectedResume.content.length.toLocaleString()} characters`
+            : undefined
+        }
+        icon={FileText}
+        tone="blue"
+        size="lg"
+        footer={
+          <>
+            {selectedResume && (
+              <Link
+                href={`/analysis?resumeId=${selectedResume.id}`}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
               >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto my-4 rounded-xl bg-slate-50 p-4 border border-slate-200">
-              <pre className="whitespace-pre-wrap font-mono text-xs text-slate-800 leading-relaxed">
-                {selectedResume.content}
-              </pre>
-            </div>
-
-            <div className="pt-2 flex justify-between items-center">
-              <div className="text-xs text-slate-500">
-                Created on{" "}
-                {new Date(selectedResume.createdAt).toLocaleDateString()}
-              </div>
-              <div className="flex gap-2">
-                <Link
-                  href={`/analysis?resumeId=${selectedResume.id}`}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>Analyze This Resume</span>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setSelectedResume(null)}
-                  className="rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Analyze This Resume</span>
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={() => setSelectedResume(null)}
+              className="cursor-pointer rounded-lg border border-white/15 px-3.5 py-1.5 text-xs font-semibold text-neutral-200 transition-colors hover:bg-white/10"
+            >
+              Close
+            </button>
+          </>
+        }
+      >
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-neutral-200">
+            {selectedResume?.content}
+          </pre>
         </div>
-      )}
+        {selectedResume && (
+          <p className="mt-3 text-xs text-neutral-500">
+            Created on {new Date(selectedResume.createdAt).toLocaleDateString()}
+          </p>
+        )}
+      </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={Boolean(confirmTarget)}
+        title="Delete this resume?"
+        description={
+          confirmTarget
+            ? `"${confirmTarget.title}" will be permanently removed. This action cannot be undone.`
+            : undefined
+        }
+        confirmLabel="Delete Resume"
+        isConfirming={Boolean(confirmTarget && deletingId === confirmTarget.id)}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setConfirmTarget(null)}
+      />
     </div>
   );
 }

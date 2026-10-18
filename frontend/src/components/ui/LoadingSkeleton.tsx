@@ -41,7 +41,7 @@ export function Skeleton({
 export function CardSkeleton({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs ${className}`}
+      className={`rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xs ${className}`}
     >
       <div className="flex items-center justify-between mb-4">
         <Skeleton width="40%" height={24} />
@@ -69,16 +69,16 @@ export function TableSkeleton({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs ${className}`}
+      className={`overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-xs ${className}`}
     >
-      <div className="border-b border-slate-200 bg-slate-50/50 p-4">
+      <div className="border-b border-white/10 bg-white/5 p-4">
         <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
           {Array.from({ length: columns }).map((_, i) => (
             <Skeleton key={i} height={18} width="70%" />
           ))}
         </div>
       </div>
-      <div className="divide-y divide-slate-100 p-4 space-y-4">
+      <div className="divide-y divide-white/5 p-4 space-y-4">
         {Array.from({ length: rows }).map((_, rIndex) => (
           <div
             key={rIndex}
@@ -98,7 +98,7 @@ export function TableSkeleton({
 export function ScoreDialSkeleton({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-8 rounded-2xl border border-slate-200/80 bg-white shadow-xs ${className}`}
+      className={`flex flex-col items-center justify-center p-8 rounded-2xl border border-white/10 bg-white/5 shadow-xs ${className}`}
     >
       <Skeleton variant="circular" width={140} height={140} className="mb-4" />
       <Skeleton width={120} height={22} className="mb-2" />

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #000000;
+  --foreground: #ffffff;
 
   /* Hero-derived brand palette (used site-wide for consistency) */
   --hero: #000000;
@@ -59,9 +59,9 @@ h6 {
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(226, 232, 240, 0.6) 0%,
-    rgba(241, 245, 249, 0.9) 50%,
-    rgba(226, 232, 240, 0.6) 100%
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.04) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite ease-in-out;
