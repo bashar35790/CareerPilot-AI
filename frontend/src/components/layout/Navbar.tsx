@@ -45,6 +45,8 @@ export function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const isHome = pathname === '/';
+
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -98,27 +100,100 @@ export function Navbar() {
       .slice(0, 2);
   };
 
+  const theme = isHome
+    ? {
+        header:
+          'absolute top-0 z-40 w-full border-b border-transparent bg-transparent',
+        focusRing: 'focus-visible:ring-white/70',
+        brandText: 'text-white',
+        brandSub: 'text-neutral-400',
+        brandBadge: 'border border-white/10 bg-white/10 text-white/80',
+        navIdle: 'text-neutral-300 hover:bg-white/10 hover:text-white',
+        navActive: 'bg-white/10 text-white font-semibold',
+        iconIdle: 'text-neutral-400',
+        iconActive: 'text-white',
+        skeleton: 'bg-white/10',
+        profileBtn:
+          'border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20',
+        profileName: 'text-white',
+        profileSub: 'text-neutral-400',
+        chevron: 'text-neutral-400',
+        chevronOpen: 'rotate-180 text-white',
+        glass:
+          'border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20',
+        playIcon: 'fill-white text-white',
+        ghost: 'text-neutral-300 hover:bg-white/10 hover:text-white',
+        ghostOutline: 'border-white/20 text-neutral-200 hover:bg-white/10',
+        primary: 'bg-white text-black hover:bg-neutral-200',
+        hamburger: 'text-white hover:bg-white/10',
+        drawer: 'border-white/10 bg-black/95',
+        drawerCard: 'border-white/10 bg-white/5',
+        drawerName: 'text-white',
+        drawerSub: 'text-neutral-400',
+        drawerNavIdle: 'text-neutral-300 hover:bg-white/10',
+        drawerNavActive: 'bg-white/10 text-white font-semibold',
+        logout:
+          'border-white/10 bg-white/5 text-rose-300 hover:bg-white/10',
+        divider: 'border-white/10',
+      }
+    : {
+        header:
+          'sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/85 backdrop-blur-md',
+        focusRing: 'focus-visible:ring-indigo-500',
+        brandText: 'text-slate-900',
+        brandSub: 'text-slate-500',
+        brandBadge: 'bg-indigo-100 text-indigo-700',
+        navIdle: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+        navActive: 'bg-indigo-50 text-indigo-700 shadow-2xs font-semibold',
+        iconIdle: 'text-slate-400',
+        iconActive: 'text-indigo-600',
+        skeleton: 'bg-slate-100',
+        profileBtn:
+          'border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300',
+        profileName: 'text-slate-900',
+        profileSub: 'text-slate-500',
+        chevron: 'text-slate-400',
+        chevronOpen: 'rotate-180 text-indigo-600',
+        glass:
+          'border-indigo-200 bg-indigo-50/70 text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300',
+        playIcon: 'fill-indigo-600 text-indigo-600',
+        ghost: 'text-slate-700 hover:text-slate-900 hover:bg-slate-100',
+        ghostOutline: 'border-slate-300 text-slate-700 hover:bg-slate-100',
+        primary: 'bg-indigo-600 text-white hover:bg-indigo-500',
+        hamburger: 'text-slate-600 hover:bg-slate-100',
+        drawer: 'border-slate-200 bg-white',
+        drawerCard: 'border-slate-200/80 bg-slate-50',
+        drawerName: 'text-slate-900',
+        drawerSub: 'text-slate-500',
+        drawerNavIdle: 'text-slate-700 hover:bg-slate-100',
+        drawerNavActive: 'bg-indigo-50 text-indigo-700 font-semibold',
+        logout: 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100',
+        divider: 'border-slate-100',
+      };
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/85 backdrop-blur-md transition-all">
+    <header className={`${theme.header} transition-all`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link
           href={isAuthenticated ? '/dashboard' : '/'}
-          className="flex items-center gap-2.5 transition-transform hover:scale-[1.01] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg"
+          className={`flex items-center gap-2.5 rounded-lg transition-transform hover:scale-[1.01] focus-visible:outline-hidden focus-visible:ring-2 ${theme.focusRing}`}
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-xs">
             <Compass className="h-6 w-6" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="text-lg font-bold tracking-tight text-slate-900">
+              <span className={`text-lg font-bold tracking-tight ${theme.brandText}`}>
                 CareerPilot
               </span>
-              <span className="rounded-md bg-indigo-100 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-indigo-700">
+              <span
+                className={`rounded-md px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide ${theme.brandBadge}`}
+              >
                 AI
               </span>
             </div>
-            <span className="text-[10px] font-medium text-slate-500 hidden sm:block">
+            <span className={`hidden text-[10px] font-medium sm:block ${theme.brandSub}`}>
               Career Alignment Platform
             </span>
           </div>
@@ -138,14 +213,12 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-700 shadow-2xs font-semibold'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    isActive ? theme.navActive : theme.navIdle
                   }`}
                 >
                   <Icon
                     className={`h-4 w-4 ${
-                      isActive ? 'text-indigo-600' : 'text-slate-400'
+                      isActive ? theme.iconActive : theme.iconIdle
                     }`}
                   />
                   <span>{item.label}</span>
@@ -158,14 +231,14 @@ export function Navbar() {
         {/* Desktop Right Action Area */}
         <div className="hidden md:flex items-center gap-3">
           {isLoading ? (
-            <div className="h-9 w-24 animate-pulse rounded-lg bg-slate-100" />
+            <div className={`h-9 w-24 animate-pulse rounded-lg ${theme.skeleton}`} />
           ) : isAuthenticated && user ? (
             /* Authenticated User Menu */
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => setProfileDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2.5 rounded-full border border-slate-200/80 bg-white p-1.5 pr-3 text-sm font-medium text-slate-700 shadow-2xs transition-all hover:bg-slate-50 hover:border-slate-300 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className={`flex items-center gap-2.5 rounded-full border p-1.5 pr-3 text-sm font-medium shadow-2xs transition-all focus-visible:outline-hidden focus-visible:ring-2 ${theme.profileBtn} ${theme.focusRing}`}
                 aria-expanded={profileDropdownOpen}
                 aria-haspopup="true"
               >
@@ -173,16 +246,16 @@ export function Navbar() {
                   {getInitials(user.fullName)}
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-semibold text-slate-900 leading-tight">
+                  <span className={`text-xs font-semibold leading-tight ${theme.profileName}`}>
                     {user.fullName}
                   </span>
-                  <span className="text-[10px] text-slate-500 leading-tight truncate max-w-[110px]">
+                  <span className={`max-w-[110px] truncate text-[10px] leading-tight ${theme.profileSub}`}>
                     {user.targetRole || user.email}
                   </span>
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
-                    profileDropdownOpen ? 'rotate-180 text-indigo-600' : ''
+                  className={`h-4 w-4 transition-transform duration-200 ${theme.chevron} ${
+                    profileDropdownOpen ? theme.chevronOpen : ''
                   }`}
                 />
               </button>
@@ -254,21 +327,21 @@ export function Navbar() {
                 type="button"
                 onClick={handleDemoLogin}
                 disabled={isDemoLoading}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/70 px-3.5 py-1.5 text-xs font-semibold text-indigo-700 transition-all hover:bg-indigo-100 hover:border-indigo-300 disabled:opacity-50 cursor-pointer shadow-2xs"
+                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold shadow-2xs transition-all disabled:opacity-50 ${theme.glass}`}
               >
-                <Play className="h-3 w-3 fill-indigo-600 text-indigo-600" />
+                <Play className={`h-3 w-3 ${theme.playIcon}`} />
                 <span>{isDemoLoading ? 'Signing in...' : 'One-Click Demo'}</span>
               </button>
 
               <Link
                 href="/login"
-                className="rounded-lg px-3.5 py-1.5 text-sm font-semibold text-slate-700 transition-colors hover:text-slate-900 hover:bg-slate-100"
+                className={`rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors ${theme.ghost}`}
               >
                 Sign in
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500 shadow-2xs"
+                className={`rounded-lg px-4 py-1.5 text-sm font-semibold shadow-2xs transition-all ${theme.primary}`}
               >
                 Get Started
               </Link>
@@ -283,9 +356,9 @@ export function Navbar() {
               type="button"
               onClick={handleDemoLogin}
               disabled={isDemoLoading}
-              className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 border border-indigo-200"
+              className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold ${theme.glass}`}
             >
-              <Play className="h-2.5 w-2.5 fill-indigo-600 text-indigo-600" />
+              <Play className={`h-2.5 w-2.5 ${theme.playIcon}`} />
               <span>Demo</span>
             </button>
           )}
@@ -293,7 +366,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className={`rounded-lg p-2 focus-visible:outline-hidden focus-visible:ring-2 ${theme.hamburger} ${theme.focusRing}`}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -308,19 +381,21 @@ export function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="border-b border-slate-200 bg-white px-4 pt-3 pb-6 md:hidden animate-in slide-in-from-top-2 duration-200">
+        <div
+          className={`border-b px-4 pb-6 pt-3 md:hidden animate-in slide-in-from-top-2 duration-200 ${theme.drawer}`}
+        >
           {isAuthenticated && user ? (
             <div className="space-y-4">
               {/* User Profile Info in Mobile */}
-              <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 border border-slate-200/80">
+              <div className={`flex items-center gap-3 rounded-xl border p-3 ${theme.drawerCard}`}>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
                   {getInitials(user.fullName)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900">
+                  <p className={`truncate text-sm font-semibold ${theme.drawerName}`}>
                     {user.fullName}
                   </p>
-                  <p className="truncate text-xs text-slate-500">{user.email}</p>
+                  <p className={`truncate text-xs ${theme.drawerSub}`}>{user.email}</p>
                 </div>
                 <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
                   {user.careerLevel}
@@ -341,14 +416,12 @@ export function Navbar() {
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                        isActive
-                          ? 'bg-indigo-50 text-indigo-700 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-100'
+                        isActive ? theme.drawerNavActive : theme.drawerNavIdle
                       }`}
                     >
                       <Icon
                         className={`h-5 w-5 ${
-                          isActive ? 'text-indigo-600' : 'text-slate-400'
+                          isActive ? theme.iconActive : theme.iconIdle
                         }`}
                       />
                       <span>{item.label}</span>
@@ -357,11 +430,11 @@ export function Navbar() {
                 })}
               </nav>
 
-              <div className="pt-2 border-t border-slate-100">
+              <div className={`border-t pt-2 ${theme.divider}`}>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100"
+                  className={`flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${theme.logout}`}
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Sign out</span>
@@ -375,22 +448,22 @@ export function Navbar() {
                 type="button"
                 onClick={handleDemoLogin}
                 disabled={isDemoLoading}
-                className="flex items-center justify-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-700 transition-colors hover:bg-indigo-100"
+                className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${theme.glass}`}
               >
-                <Play className="h-4 w-4 fill-indigo-600 text-indigo-600" />
+                <Play className={`h-4 w-4 ${theme.playIcon}`} />
                 <span>{isDemoLoading ? 'Signing in...' : 'One-Click Demo Login'}</span>
               </button>
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                className={`flex items-center justify-center rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors ${theme.ghostOutline}`}
               >
                 Sign in
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-indigo-500"
+                className={`flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold shadow-xs transition-colors ${theme.primary}`}
               >
                 Create an account
               </Link>

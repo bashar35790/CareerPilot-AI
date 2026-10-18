@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/store/auth-context";
 import { ToastProvider } from "@/components/ui";
 import { Navbar, Footer } from "@/components/layout";
@@ -12,6 +12,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -29,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col antialiased bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} min-h-full flex flex-col antialiased bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900`}
       >
         <AuthProvider>
           <ToastProvider>

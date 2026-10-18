@@ -1,78 +1,11 @@
-import Link from 'next/link';
-import {
-  ArrowRight,
-  BarChart3,
-  CheckCircle2,
-  Map,
-  ShieldCheck,
-  Sparkles,
-  Zap,
-} from 'lucide-react';
+import { BarChart3, Map, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui';
+import { HeroSection } from '@/components/home/HeroSection';
 
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-16 sm:py-24 lg:py-28">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,var(--color-indigo-100),white)] opacity-60" />
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 mb-6">
-            <Badge variant="info" dot>
-              Full-Stack Developer Assessment Platform
-            </Badge>
-          </div>
-
-          {/* Heading */}
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            Align Your Resume with Real Job Postings Using{' '}
-            <span className="bg-linear-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
-              Explainable AI
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 leading-relaxed">
-            Stop guessing why applications fail. Compare your technical profile
-            against target job descriptions, uncover verified skill gaps, and
-            track tailored milestone roadmaps to land your next engineering role.
-          </p>
-
-          {/* Call to Actions */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:bg-indigo-500 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              <span>Get Started Free</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-700 shadow-2xs transition-all hover:bg-slate-50 hover:border-slate-400"
-            >
-              <span>Sign in / Demo Access</span>
-            </Link>
-          </div>
-
-          {/* Key Value Propositions */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-              <span>Hybrid Deterministic + Gemini 2.5 Flash</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-indigo-600 shrink-0" />
-              <span>Secure HttpOnly Cookie Sessions</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Zap className="h-4 w-4 text-amber-500 shrink-0" />
-              <span>Zero Mock Production Responses</span>
-            </span>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Feature Pillar Highlights */}
       <section className="border-t border-slate-200/80 bg-white/70 py-16 sm:py-20">
