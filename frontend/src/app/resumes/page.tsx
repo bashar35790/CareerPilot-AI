@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Calendar,
   Check,
@@ -12,11 +12,11 @@ import {
   Star,
   Trash2,
   X,
-} from 'lucide-react';
-import { api, getApiErrorMessage } from '@/lib/api';
-import { ApiResponse, Resume, ResumeSummary } from '@/types';
-import { Badge, CardSkeleton, EmptyState, useToast } from '@/components/ui';
-import { createResumeSchema } from '@/schemas/resume.schema';
+} from "lucide-react";
+import { api, getApiErrorMessage } from "@/lib/api";
+import { ApiResponse, Resume, ResumeSummary } from "@/types";
+import { Badge, CardSkeleton, EmptyState, useToast } from "@/components/ui";
+import { createResumeSchema } from "@/schemas/resume.schema";
 
 const SAMPLE_RESUME_TEXT = `ALEX DEVELOPER
 Full-Stack Software Engineer
@@ -58,9 +58,9 @@ export default function ResumesPage() {
 
   // Form State
   const [formData, setFormData] = useState({
-    title: '',
-    targetRole: '',
-    content: '',
+    title: "",
+    targetRole: "",
+    content: "",
     isPrimary: false,
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -68,12 +68,13 @@ export default function ResumesPage() {
   const fetchResumes = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>('/resumes');
+      const response =
+        await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>("/resumes");
       if (response.data.success && response.data.data) {
         setResumes(response.data.data.resumes);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to load resumes.'));
+      toast.error(getApiErrorMessage(error, "Failed to load resumes."));
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +86,9 @@ export default function ResumesPage() {
 
   const handleOpenCreateModal = () => {
     setFormData({
-      title: '',
-      targetRole: '',
-      content: '',
+      title: "",
+      targetRole: "",
+      content: "",
       isPrimary: resumes.length === 0, // Default to primary if first resume
     });
     setFieldErrors({});
@@ -101,8 +102,8 @@ export default function ResumesPage() {
 
   const handleLoadSample = () => {
     setFormData({
-      title: 'Full-Stack Developer Resume',
-      targetRole: 'Junior Full-Stack Engineer',
+      title: "Full-Stack Developer Resume",
+      targetRole: "Junior Full-Stack Engineer",
       content: SAMPLE_RESUME_TEXT,
       isPrimary: resumes.length === 0,
     });
@@ -129,16 +130,16 @@ export default function ResumesPage() {
     setIsSubmitting(true);
     try {
       const response = await api.post<ApiResponse<{ resume: Resume }>>(
-        '/resumes',
-        validationResult.data
+        "/resumes",
+        validationResult.data,
       );
       if (response.data.success && response.data.data?.resume) {
-        toast.success('Resume saved successfully!');
+        toast.success("Resume saved successfully!");
         handleCloseModal();
         fetchResumes();
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to save resume.'));
+      toast.error(getApiErrorMessage(error, "Failed to save resume."));
     } finally {
       setIsSubmitting(false);
     }
@@ -150,39 +151,43 @@ export default function ResumesPage() {
       toast.success(`"${resume.title}" marked as primary resume.`);
       fetchResumes();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to update primary status.'));
+      toast.error(
+        getApiErrorMessage(error, "Failed to update primary status."),
+      );
     }
   };
 
   const handleViewResume = async (id: string) => {
     setIsViewLoading(true);
     try {
-      const response = await api.get<ApiResponse<{ resume: Resume }>>(`/resumes/${id}`);
+      const response = await api.get<ApiResponse<{ resume: Resume }>>(
+        `/resumes/${id}`,
+      );
       if (response.data.success && response.data.data?.resume) {
         setSelectedResume(response.data.data.resume);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to load resume.'));
+      toast.error(getApiErrorMessage(error, "Failed to load resume."));
     } finally {
       setIsViewLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this resume?')) {
+    if (!window.confirm("Are you sure you want to delete this resume?")) {
       return;
     }
 
     setDeletingId(id);
     try {
       await api.delete(`/resumes/${id}`);
-      toast.success('Resume deleted successfully.');
+      toast.success("Resume deleted successfully.");
       if (selectedResume?.id === id) {
         setSelectedResume(null);
       }
       fetchResumes();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to delete resume.'));
+      toast.error(getApiErrorMessage(error, "Failed to delete resume."));
     } finally {
       setDeletingId(null);
     }
@@ -201,11 +206,12 @@ export default function ResumesPage() {
               Resume Management
             </h1>
             <Badge variant="info" size="sm">
-              {resumes.length} {resumes.length === 1 ? 'Resume' : 'Resumes'}
+              {resumes.length} {resumes.length === 1 ? "Resume" : "Resumes"}
             </Badge>
           </div>
           <p className="mt-1 text-sm text-slate-500">
-            Create, manage, and benchmark your engineering resumes against target job postings.
+            Create, manage, and benchmark your engineering resumes against
+            target job postings.
           </p>
         </div>
 
@@ -253,8 +259,8 @@ export default function ResumesPage() {
                 key={resume.id}
                 className={`relative flex flex-col justify-between rounded-2xl border bg-white p-6 shadow-xs transition-all hover:shadow-md ${
                   resume.isPrimary
-                    ? 'border-indigo-300 ring-2 ring-indigo-500/10'
-                    : 'border-slate-200 hover:border-slate-300'
+                    ? "border-indigo-300 ring-2 ring-indigo-500/10"
+                    : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 <div>
@@ -279,13 +285,15 @@ export default function ResumesPage() {
                     {resume.title}
                   </h3>
                   <p className="mt-0.5 text-xs font-medium text-slate-500 line-clamp-1">
-                    {resume.targetRole || 'General Engineering Role'}
+                    {resume.targetRole || "General Engineering Role"}
                   </p>
 
                   {/* Meta */}
                   <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-lg p-2.5 border border-slate-100">
                     <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                    <span>Updated {new Date(resume.updatedAt).toLocaleDateString()}</span>
+                    <span>
+                      Updated {new Date(resume.updatedAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
 
@@ -351,9 +359,12 @@ export default function ResumesPage() {
                   <FileText className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Add New Resume</h3>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Add New Resume
+                  </h3>
                   <p className="text-xs text-slate-500">
-                    Paste or type your resume content (min 100, max 20,000 characters).
+                    Paste or type your resume content (min 100, max 20,000
+                    characters).
                   </p>
                 </div>
               </div>
@@ -368,7 +379,9 @@ export default function ResumesPage() {
 
             {/* Quick Sample Button */}
             <div className="pt-4 pb-2 flex justify-between items-center">
-              <span className="text-xs text-slate-500">Need a starting point?</span>
+              <span className="text-xs text-slate-500">
+                Need a starting point?
+              </span>
               <button
                 type="button"
                 onClick={handleLoadSample}
@@ -380,7 +393,11 @@ export default function ResumesPage() {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4 py-2 pr-1" noValidate>
+            <form
+              onSubmit={handleSubmit}
+              className="flex-1 overflow-y-auto space-y-4 p-2"
+              noValidate
+            >
               {/* Title */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
@@ -389,28 +406,39 @@ export default function ResumesPage() {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   placeholder="e.g. Full-Stack Software Engineer CV"
-                  className={`block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                    fieldErrors.title ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300 bg-white'
+                  className={`block w-full rounded-lg border px-3.5 py-2 text-sm placeholder:text-slate-400 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
+                    fieldErrors.title
+                      ? "border-rose-300 bg-rose-50/30"
+                      : "border-slate-300 bg-white"
                   }`}
                 />
                 {fieldErrors.title && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.title}</p>
+                  <p className="mt-1 text-xs text-rose-600">
+                    {fieldErrors.title}
+                  </p>
                 )}
               </div>
 
               {/* Target Role */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                  Target Role <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                  Target Role{" "}
+                  <span className="text-slate-400 font-normal lowercase">
+                    (optional)
+                  </span>
                 </label>
                 <input
                   type="text"
                   value={formData.targetRole}
-                  onChange={(e) => setFormData({ ...formData, targetRole: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, targetRole: e.target.value })
+                  }
                   placeholder="e.g. Junior Backend Engineer"
-                  className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -424,27 +452,33 @@ export default function ResumesPage() {
                   <span
                     className={`text-xs font-mono font-medium ${
                       charCount === 0
-                        ? 'text-slate-400'
+                        ? "text-slate-400"
                         : isContentValid
-                        ? 'text-emerald-600'
-                        : 'text-rose-600'
+                          ? "text-emerald-600"
+                          : "text-rose-600"
                     }`}
                   >
-                    {charCount.toLocaleString()} / 20,000 characters{' '}
-                    {charCount > 0 && charCount < 100 && '(min 100 required)'}
+                    {charCount.toLocaleString()} / 20,000 characters{" "}
+                    {charCount > 0 && charCount < 100 && "(min 100 required)"}
                   </span>
                 </div>
                 <textarea
                   rows={9}
                   value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, content: e.target.value })
+                  }
                   placeholder="Paste your plain-text or Markdown resume here (e.g. Summary, Skills, Work Experience, Projects)..."
-                  className={`block w-full rounded-lg border p-3 font-mono text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
-                    fieldErrors.content ? 'border-rose-300 bg-rose-50/30' : 'border-slate-300 bg-white'
+                  className={`block w-full rounded-lg border p-3 font-mono text-xs placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ${
+                    fieldErrors.content
+                      ? "border-rose-300 bg-rose-50/30"
+                      : "border-slate-300 bg-white"
                   }`}
                 />
                 {fieldErrors.content && (
-                  <p className="mt-1 text-xs text-rose-600">{fieldErrors.content}</p>
+                  <p className="mt-1 text-xs text-rose-600">
+                    {fieldErrors.content}
+                  </p>
                 )}
               </div>
 
@@ -454,10 +488,15 @@ export default function ResumesPage() {
                   id="isPrimary"
                   type="checkbox"
                   checked={formData.isPrimary}
-                  onChange={(e) => setFormData({ ...formData, isPrimary: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isPrimary: e.target.checked })
+                  }
                   className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <label htmlFor="isPrimary" className="text-xs font-medium text-slate-700 cursor-pointer">
+                <label
+                  htmlFor="isPrimary"
+                  className="text-xs font-medium text-slate-700 cursor-pointer"
+                >
                   Set as my primary resume for evaluations
                 </label>
               </div>
@@ -500,9 +539,11 @@ export default function ResumesPage() {
           <div className="relative w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">{selectedResume.title}</h3>
+                <h3 className="text-lg font-bold text-slate-900">
+                  {selectedResume.title}
+                </h3>
                 <p className="text-xs text-slate-500">
-                  {selectedResume.targetRole || 'Engineering Candidate'} •{' '}
+                  {selectedResume.targetRole || "Engineering Candidate"} •{" "}
                   {selectedResume.content.length.toLocaleString()} characters
                 </p>
               </div>
@@ -523,7 +564,8 @@ export default function ResumesPage() {
 
             <div className="pt-2 flex justify-between items-center">
               <div className="text-xs text-slate-500">
-                Created on {new Date(selectedResume.createdAt).toLocaleDateString()}
+                Created on{" "}
+                {new Date(selectedResume.createdAt).toLocaleDateString()}
               </div>
               <div className="flex gap-2">
                 <Link
