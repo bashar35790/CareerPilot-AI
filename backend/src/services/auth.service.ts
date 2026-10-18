@@ -194,3 +194,12 @@ export async function logoutUser(refreshToken: unknown): Promise<void> {
     data: { isRevoked: true },
   });
 }
+
+export async function getCurrentUser(userId: string): Promise<PublicUser> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new UnauthorizedError('User not found');
+  }
+  return toPublicUser(user);
+}
+

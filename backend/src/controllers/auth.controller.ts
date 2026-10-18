@@ -4,6 +4,7 @@ import { sendSuccess } from '../lib/response';
 import { REFRESH_TOKEN_COOKIE, clearAuthCookies, setAuthCookies } from '../lib/tokens';
 import {
   demoLogin,
+  getCurrentUser,
   loginUser,
   logoutUser,
   refreshSession,
@@ -39,3 +40,9 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   clearAuthCookies(res);
   return sendSuccess(res, { message: 'Successfully logged out' });
 });
+
+export const me = asyncHandler(async (req: Request, res: Response) => {
+  const user = await getCurrentUser(req.user!.id);
+  return sendSuccess(res, { user });
+});
+
