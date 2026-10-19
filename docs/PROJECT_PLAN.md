@@ -1,95 +1,88 @@
 # Project Plan: CareerPilot AI
 
-> **Product Name:** CareerPilot AI  
-> **Product Type:** AI-Powered Full-Stack Career Development & Job Alignment Platform  
-> **Target Audience:** Students, Fresh Graduates, Junior Developers, Career Switchers, Job Seekers  
-> **Document Owner:** Senior Software Architect & Product Analyst  
-> **Version:** 1.0.0 (Planning Stage)  
-> **Date:** October 2026  
+**Product:** AI-powered career development and job-alignment platform
+**Audience:** Students, fresh graduates, junior developers, career switchers, active job seekers
 
 ---
 
-## 1. Executive Summary & Project Overview
+## 1. Overview
 
-**CareerPilot AI** is an intelligent, full-stack career readiness platform designed to solve the critical friction job seekers face: understanding whether their skills match current market demands, tailoring their resumes for specific job descriptions, identifying actionable skill gaps, and preparing for technical interviews.
+CareerPilot AI is a full-stack career readiness platform. It tackles a common problem for job seekers: not knowing whether their skills match current market demand, and not knowing how to tailor a resume for a specific job.
 
-Unlike generic resume builders or unfocused multi-tool websites, CareerPilot AI provides a cohesive, end-to-end journey centered on **data-backed explainability**. The platform takes a candidate's resume and a target job description, performs a multi-dimensional gap analysis (hard skills, experience depth, domain keywords), delivers an explainable qualification match score, and generates a personalized improvement plan.
+Instead of another generic "resume score" tool, the platform takes a candidate's resume and a target job description, runs a multi-dimensional gap analysis (hard skills, experience depth, resume completeness), returns an explainable match score, and generates a personalized improvement plan.
 
-Built with a modern full-stack architecture (**Next.js**, **Express.js**, **TypeScript**, **PostgreSQL**, and **Prisma ORM**), CareerPilot AI demonstrates robust software engineering standards: strict relational modeling, secure cookie-based session management, server-side AI integration via Google Gemini API with schema enforcement, and comprehensive automated testing.
+The stack is a standard modern full-stack setup: **Next.js**, **Express.js**, **TypeScript**, **PostgreSQL**, and **Prisma ORM**. The backend uses strict relational modeling, HttpOnly cookie sessions, and server-side AI calls to Google Gemini with schema enforcement. The core logic is covered by an automated test suite.
 
 ---
 
-## 2. Problem Statement & User Pain Points
+## 2. Problem Statement
 
-### 2.1 The Core Problem
-Early-career technologists and active job seekers face high rejection rates and silent rejections from Applicant Tracking Systems (ATS) and hiring managers. They struggle with three core challenges:
-1. **The "Black Box" Job Application Problem:** Candidates do not know why their resume fails to pass initial screenings or how well their background aligns with specific job requirements.
-2. **Generic, Unactionable Feedback:** Existing tools provide generic "resume score out of 100" metrics without contextualizing the score against specific job descriptions or distinguishing missing technical skills from missing soft skills.
-3. **Disconnected Preparation Workflows:** Job seekers use disparate tools to edit resumes, research technical questions, and track career learning milestones, resulting in scattered context and lack of measurable progress.
+Early-career technologists and active job seekers face high rejection rates, often without feedback. Three challenges stand out:
 
-### 2.2 Target Users & Personas
+1. **The application black box.** Candidates do not know why their resume fails initial screening or how well it aligns with a specific role.
+2. **Generic, unactionable feedback.** Most tools produce a single score without contextualizing it against the job description, and without separating missing hard skills from soft skills.
+3. **Disconnected preparation.** Resume editing, skills research, and learning planning happen in separate tools with no shared context or measurable progress.
+
+### Target users
 
 ```mermaid
 graph TD
     User([Job Seekers & Early Career Developers])
     User --> P1[Persona 1: Alex - The CS Graduate]
     User --> P2[Persona 2: Priya - The Junior Full-Stack Dev]
-    User --> P3[Persona 3: Marcus - The Career Switcher]
 
-    P1 --> Need1[Needs: Skill benchmark against entry-level job postings & resume tailoring]
-    P2 --> Need2[Needs: Clear gap analysis for mid-level promotions & targeted interview prep]
-    P3 --> Need3[Needs: Translating prior non-tech experience into tech-aligned competencies]
+    P1 --> Need1[Needs: Skill benchmark against entry-level postings & resume tailoring]
+    P2 --> Need2[Needs: Clear gap analysis and a trackable learning plan]
 ```
 
-#### Persona 1: Alex — The Computer Science New Graduate
-- **Background:** Recent graduate with academic projects in Java and Python, seeking their first Junior Software Engineer role.
-- **Pain Point:** Applies to 50+ roles with the same generic CV and receives automated rejections. Cannot tell which required frameworks (e.g., Docker, PostgreSQL, TypeScript) are missing from their profile.
-- **Goal:** Upload resume, paste a target job description, immediately see missing high-priority skills, and obtain tailored bullet-point recommendations.
+**Persona 1: Alex - the computer science graduate**
+- Recent graduate with academic projects in Java and Python, looking for a first junior software engineer role.
+- Applies to dozens of roles with the same generic CV and receives automated rejections, with no idea which required tools (Docker, PostgreSQL, TypeScript) are missing.
+- Wants to paste a target job description and immediately see missing high-priority skills plus tailored bullet-point suggestions.
 
-#### Persona 2: Priya — The Junior Full-Stack Developer
-- **Background:** 1.5 years experience maintaining Express/React apps, aiming for a competitive Frontend/Full-Stack role.
-- **Pain Point:** Uncertain how to highlight architectural impact and metrics rather than simple task descriptions.
-- **Goal:** Understand technical interview expectations for specific target roles and track learning tasks in a personalized career roadmap.
-
----
-
-## 3. Product Goals & Core Value Proposition
-
-### 3.1 Product Goals
-1. **Explainable Job Matching:** Provide transparent, category-by-category alignment scoring (Matched Skills, Missing Mandatory Skills, Optional/Nice-to-Have Skills) rather than a single unexplained number.
-2. **Actionable Remediation:** Convert identified skill gaps into concrete resume rewrite suggestions and structured learning milestones.
-3. **End-to-End Workflow Persistence:** Ensure every resume, job description, analysis, roadmap, and interview session is securely persisted and accessible across user sessions.
-4. **Engineering Rigor & Trust:** Maintain strict relational data integrity in PostgreSQL, secure authentication via httpOnly cookies, and predictable server-side AI responses validated against strict schemas.
-
-### 3.2 Non-Goals (Explicit Exclusions)
-- **Non-Goal 1: E-commerce or Course Marketplace.** No course purchasing, shopping carts, or generic resource selling (eliminating the legacy "Items" feature entirely).
-- **Non-Goal 2: Social Networking or Public Profiles.** No user friending, public feeds, or community messaging.
-- **Non-Goal 3: Real-Time Audio/Video Proctoring.** Technical interview prep is text-based and rubric-scored; no live video or voice streaming.
-- **Non-Goal 4: Automated Job Scraping or Auto-Apply Bots.** Users provide job descriptions directly via text or URL input; the platform does not scrape external job boards or automatically submit applications.
+**Persona 2: Priya - the junior full-stack developer**
+- About 1.5 years maintaining Express/React apps, aiming for a competitive full-stack role.
+- Unsure how to highlight architectural impact and metrics rather than list tasks.
+- Wants a clear gap analysis and a personalized roadmap with trackable milestones.
 
 ---
 
-## 4. Minimum Viable Product (MVP) Scope Definition
+## 3. Product Goals & Value Proposition
 
-To ensure an assessment-ready, high-quality application with complete workflows rather than shallow half-features, the MVP scope is strictly partitioned:
+1. **Explainable matching.** Show alignment category by category (matched skills, missing mandatory skills, optional skills) rather than a single unexplained number.
+2. **Actionable remediation.** Turn each identified gap into concrete resume rewrites and learning milestones.
+3. **Persistent workflow.** Keep every resume, job description, analysis, and roadmap tied to the user's account and available across sessions.
+4. **Engineering rigor.** Strict relational integrity in PostgreSQL, cookie-based auth, and predictable AI responses validated against strict schemas.
 
-| Feature Domain | In MVP Scope | Deferred to Future Phase | Rationale |
+### Non-goals
+
+- **No marketplace or store.** No course purchasing, carts, or generic resource sales.
+- **No social features.** No friending, public feeds, or messaging.
+- **No job scraping or auto-apply.** Users paste job descriptions themselves; the platform does not scrape job boards or submit applications.
+- **No PDF/DOCX parsing in the MVP.** Resumes are entered as text.
+
+---
+
+## 4. MVP Scope
+
+To keep the assessment build complete rather than broad, the scope is split as follows:
+
+| Feature domain | In MVP | Deferred | Notes |
 | :--- | :---: | :---: | :--- |
-| **Authentication & User Profiles** | **Yes** | — | Secure email/password registration, login, profile management, and session invalidation via httpOnly cookies. |
-| **Resume Management** | **Yes** | — | Create, store, edit, and version text-based resumes (with planned support for clean plain-text/markdown input). |
-| **Job Description Capture** | **Yes** | — | Input, parse, and store target job descriptions (Title, Company, Raw Text, Level). |
-| **Resume–Job Matching & Skill Gap Analysis** | **Yes** | — | **Flagship AI Feature:** Hybrid deterministic and LLM-driven comparison with structured persistence. |
-| **Explainable Action Plan** | **Yes** | — | Prioritized skill gaps, bullet point rewrites, and impact suggestions. |
-| **Career Roadmap Generation & Task Tracking** | **Yes** | — | Personalized phase-based roadmap with toggleable milestone tasks stored in PostgreSQL. |
-| **Direct PDF/DOCX Parsing Engine** | Deferred | Future | MVP focuses on clean text-extracted resume content to eliminate flaky third-party OCR/parser issues during evaluation. |
-| **Interactive Multi-Turn Voice Interview** | Deferred | Future | MVP focuses on structured Q&A generation with self-assessment rubrics. |
-| **AI Cover Letter Generator** | Deferred | Future | High-value, but secondary to the core matching and roadmap loop. |
+| **Authentication & user profiles** | Yes | - | Email/password registration, login, profile management, session invalidation via HttpOnly cookies. |
+| **Resume management** | Yes | - | Create, store, edit, and delete text-based resumes. |
+| **Job description capture** | Yes | - | Store target postings with title, company, raw text, and level. |
+| **Resume-Job matching & skill gap analysis** | Yes | - | Flagship feature: hybrid deterministic + LLM comparison with structured persistence. |
+| **Action plan** | Yes | - | Prioritized skill gaps, bullet-point rewrites, and impact suggestions. |
+| **Career roadmap generation & task tracking** | Yes | - | Phase-based roadmap with toggleable tasks stored in PostgreSQL. |
+| **PDF/DOCX parsing** | - | Future | MVP uses clean text input to avoid flaky third-party parsers during review. |
+| **Cover letter generation** | - | Future | Secondary to the core matching and roadmap loop. |
 
 ---
 
 ## 5. Primary User Journeys
 
-### Journey 1: Resume–Job Description Alignment & Gap Analysis
+### Journey 1: Resume-Job gap analysis
 
 ```mermaid
 sequenceDiagram
@@ -100,19 +93,19 @@ sequenceDiagram
     participant DB as PostgreSQL (Prisma)
     participant AI as Gemini API
 
-    User->>UI: Paste Resume & Target Job Description
-    UI->>API: POST /api/v1/analyses (resumeId / text, jobText)
+    User->>UI: Paste resume & target job description
+    UI->>API: POST /api/v1/analyses (resumeId or text, job text)
     API->>API: Validate input schemas (Zod)
     API->>AI: Send prompt with structured JSON schema
     AI-->>API: Return structured match breakdown & gaps
     API->>API: Deterministic reconciliation & validation
-    API->>DB: Save Resume, JobDescription, ResumeAnalysis, AnalysisSkills in transaction
-    DB-->>API: Persisted entity records
-    API-->>UI: Return 201 Created with full Analysis payload
-    UI->>User: Display interactive Match Score, Skill Badges, and Actionable Recommendations
+    API->>DB: Save Resume, JobDescription, ResumeAnalysis, AnalysisSkills in a transaction
+    DB-->>API: Persisted records
+    API-->>UI: 201 Created with the full analysis payload
+    UI->>User: Display match score, skill badges, and recommendations
 ```
 
-### Journey 2: Career Roadmap Creation & Milestone Execution
+### Journey 2: Career roadmap creation and milestone tracking
 
 ```mermaid
 sequenceDiagram
@@ -123,39 +116,38 @@ sequenceDiagram
     participant DB as PostgreSQL (Prisma)
     participant AI as Gemini API
 
-    User->>UI: Select Target Role & Desired Timeline
+    User->>UI: Select a completed analysis, target role & timeframe
     UI->>API: POST /api/v1/roadmaps
-    API->>AI: Generate phased learning roadmap with milestone tasks
+    API->>AI: Generate phased roadmap from the identified skill gaps
     AI-->>API: Validated JSON roadmap structure
-    API->>DB: Persist CareerRoadmap and RoadmapTasks
+    API->>DB: Persist CareerRoadmap and RoadmapTasks in a transaction
     DB-->>API: Saved roadmap with IDs
-    API-->>UI: Return 201 Created
-    User->>UI: Toggle task completion status
-    UI->>API: PATCH /api/v1/roadmaps/tasks/:id
-    API->>DB: Update task isCompleted flag
-    DB-->>API: Updated task
-    API-->>UI: Live progress bar updates
+    API-->>UI: 201 Created
+    User->>UI: Toggle task completion
+    UI->>API: PATCH /api/v1/roadmaps/tasks/:taskId
+    API->>DB: Update task isCompleted flag and recompute progress
+    DB-->>API: Updated progress
+    API-->>UI: Updated completion percentage
 ```
 
 ---
 
-## 6. Success Metrics & Quality Criteria
+## 6. Success Criteria
 
-| Metric Category | Assessment Benchmark | Production Target |
-| :--- | :--- | :--- |
-| **Data Integrity** | 100% of user data linked via foreign keys; zero orphan records. | Zero cascading deletion failures; fully indexed foreign keys. |
-| **Security Standard** | 0 tokens stored in `localStorage`; all sessions authenticated via httpOnly cookies. | OWASP Top 10 compliance; strict CORS and CSRF protections. |
-| **AI Reliability** | 100% of AI responses conform to defined Zod validation schemas. | Fallback graceful error state with exponential backoff; no app crashes. |
-| **API Performance** | P95 latency for non-AI endpoints < 80ms. | P95 latency for AI-assisted matching < 4.5s. |
-| **Test Coverage** | Automated test suite verifying auth, validation, matching logic, and API endpoints. | Minimum 85% branch coverage on business logic & validation. |
+| Area | Target |
+| :--- | :--- |
+| **Data integrity** | All user data linked by foreign keys; no orphan records; cascading deletes behave correctly. |
+| **Security** | No tokens in `localStorage` or `sessionStorage`; all sessions authenticated via HttpOnly cookies. |
+| **AI reliability** | All AI responses validated against Zod schemas; clean error state on upstream failure, never fake data. |
+| **API performance** | Non-AI endpoints resolve quickly; AI-assisted matching completes within a few seconds. |
+| **Test coverage** | Automated tests cover auth, validation, matching logic, and API endpoints. |
 
 ---
 
-## 7. Risks, Assumptions & Mitigation Strategies
+## 7. Risks & Mitigation
 
-| Identified Risk | Severity | Likelihood | Mitigation Strategy |
+| Risk | Severity | Likelihood | Mitigation |
 | :--- | :---: | :---: | :--- |
-| **Gemini API Rate Limiting / 429 Quota Exceeded** | High | Medium | Implement server-side in-memory caching for identical job descriptions, user-level rate limiting, and exponential retry. |
-| **Hallucinated or Invalid AI JSON Response** | High | Low | Enforce Gemini `responseSchema` / `application/json` mode paired with strict Zod parsing on the Express backend before persistence. |
-| **Scope Creep during Assessment Development** | High | High | Enforce strict phase gates; deliver and test core matching and persistence before touching secondary features. |
-| **Assessment Deadline Discrepancy** | High | Confirmed | Recruitment email and assignment document dates may differ. **Deadline must be formally confirmed** prior to scheduling final delivery milestones. |
+| **Gemini rate limiting / quota exceeded** | High | Medium | Retry with backoff and rotate to the fallback model. |
+| **Invalid or hallucinated AI JSON** | High | Low | Enforce Gemini `responseSchema` plus strict Zod parsing before persistence. |
+| **Scope creep** | High | High | Work in priority phases; deliver and test the core matching and persistence loop before secondary features. |

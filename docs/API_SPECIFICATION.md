@@ -1,20 +1,18 @@
 # REST API Specification: CareerPilot AI
 
-> **Protocol:** HTTP/1.1 over TLS (HTTPS)  
-> **Base Path:** `/api/v1`  
-> **Data Format:** JSON (`application/json`)  
-> **Authentication:** Signed `httpOnly` Cookie (`access_token`)  
-> **Version:** 1.0.0 (Proposed Specification)  
-> **Author:** Senior Software Architect  
+**Base path:** `/api/v1`
+**Data format:** JSON (`application/json`)
+**Authentication:** signed `httpOnly` cookie (`access_token`)
 
 ---
 
-## 1. Global REST API Conventions
+## 1. Conventions
 
-### 1.1 Response Envelope Structure
-All API responses use a predictable, standardized envelope containing a boolean `success` flag, a `data` payload (or `null`), a descriptive `error` payload on failure, and a `meta` block.
+### 1.1 Response envelope
 
-#### Success Envelope (HTTP 200, 201)
+Every response uses the same envelope.
+
+**Success (200, 201):**
 ```json
 {
   "success": true,
@@ -28,7 +26,7 @@ All API responses use a predictable, standardized envelope containing a boolean 
 }
 ```
 
-#### Error Envelope (HTTP 4xx, 5xx)
+**Error (4xx, 5xx):**
 ```json
 {
   "success": false,
@@ -36,10 +34,7 @@ All API responses use a predictable, standardized envelope containing a boolean 
     "code": "VALIDATION_ERROR",
     "message": "Invalid request parameters",
     "details": [
-      {
-        "field": "email",
-        "issue": "Invalid email address format"
-      }
+      { "field": "email", "issue": "Invalid email address format" }
     ]
   },
   "meta": {
@@ -48,89 +43,77 @@ All API responses use a predictable, standardized envelope containing a boolean 
 }
 ```
 
-### 1.2 Standard HTTP Status Codes
+### 1.2 Status codes
 
-| Status Code | Semantics in CareerPilot AI |
+| Status | Meaning |
 | :--- | :--- |
-| `200 OK` | Successful query or idempotent update. |
-| `201 Created` | Resource successfully created (Resume, Job, Analysis, Roadmap). |
-| `400 Bad Request` | Malformed JSON or Zod schema validation failure. |
+| `200 OK` | Successful query or update. |
+| `201 Created` | Resource created (resume, job, analysis, roadmap). |
+| `400 Bad Request` | Malformed JSON or Zod validation failure. |
 | `401 Unauthorized` | Missing, expired, or invalid authentication cookie. |
-| `403 Forbidden` | Authenticated user lacks permission to access target resource (cross-tenant violation). |
-| `404 Not Found` | Requested resource does not exist. |
-| `409 Conflict` | Unique constraint violation (e.g., email already registered). |
-| `429 Too Many Requests`| Rate limit exceeded (user or IP level). |
-| `500 Internal Server Error` | Unexpected server fault; internal stack redacted. |
-| `503 Service Unavailable` | Upstream AI engine (Gemini) failure or quota exhaustion. |
+| `403 Forbidden` | Authenticated but not permitted to access the resource. |
+| `404 Not Found` | Resource does not exist or does not belong to the user. |
+| `409 Conflict` | Unique constraint violation (e.g. email already registered). |
+| `500 Internal Server Error` | Unexpected fault; internal details redacted. |
+| `503 Service Unavailable` | Upstream AI engine failure or quota exhaustion. |
 
 ---
 
-## 2. API Endpoint Catalogue
+## 2. Endpoint Catalogue
 
 ```
 /api/v1/
 ├── auth/
-│   ├── POST   /register             # Register new user account
+│   ├── POST   /register             # Register a new account
 │   ├── POST   /login                # Authenticate and receive session cookies
-│   ├── POST   /demo                 # One-click demo login for evaluation
+│   ├── POST   /demo                 # One-click demo login
 │   ├── POST   /refresh              # Rotate refresh token and refresh access token
 │   ├── POST   /logout               # Clear cookies and revoke refresh token
-│   └── GET    /me                   # Retrieve authenticated user session details
+│   └── GET    /me                   # Current session user
 ├── users/
-│   ├── GET    /profile              # Fetch user profile and summary stats
+│   ├── GET    /profile              # Profile and summary stats
 │   └── PUT    /profile              # Update profile details
 ├── resumes/
-│   ├── POST   /                     # Save a new resume
-│   ├── GET    /                     # List authenticated user's resumes
-│   ├── GET    /:id                  # Retrieve specific resume by ID
-│   ├── PUT    /:id                  # Update resume title or content
-│   └── DELETE /:id                  # Delete resume
+│   ├── POST   /                     # Create a resume
+│   ├── GET    /                     # List the user's resumes
+│   ├── GET    /:id                  # Fetch a resume by ID
+│   ├── PUT    /:id                  # Update a resume
+│   └── DELETE /:id                  # Delete a resume
 ├── jobs/
-│   ├── POST   /                     # Save target job description
+│   ├── POST   /                     # Save a job description
 │   ├── GET    /                     # List saved job descriptions
-│   ├── GET    /:id                  # Retrieve job description by ID
-│   └── DELETE /:id                  # Delete job description
+│   ├── GET    /:id                  # Fetch a job description by ID
+│   └── DELETE /:id                  # Delete a job description
 ├── analyses/
-│   ├── POST   /                     # Execute Resume–Job gap analysis (Flagship AI)
-│   ├── GET    /                     # List user analysis history (paginated)
-│   ├── GET    /:id                  # Fetch full analysis breakdown & recommendations
-│   └── DELETE /:id                  # Delete analysis record
+│   ├── POST   /                     # Run a resume-job gap analysis
+│   ├── GET    /                     # List analysis history (paginated)
+│   ├── GET    /:id                  # Fetch a full analysis breakdown
+│   └── DELETE /:id                  # Delete an analysis
 └── roadmaps/
-    ├── POST   /                     # Generate AI Career Roadmap from analysis or role
-    ├── GET    /                     # List user roadmaps
-    ├── GET    /:id                  # Retrieve roadmap with phased tasks
-    └── PATCH  /tasks/:taskId        # Toggle completion status of a roadmap task
+    ├── POST   /                     # Generate a roadmap from an analysis
+    ├── GET    /                     # List the user's roadmaps
+    ├── GET    /:id                  # Fetch a roadmap with phased tasks
+    └── PATCH  /tasks/:taskId        # Toggle a task's completion status
 ```
 
 ---
 
-## 3. Detailed Endpoint Specifications
+## 3. Endpoint Details
 
-### 3.1 Authentication Group
+### 3.1 Authentication
 
 #### `POST /api/v1/auth/register`
-- **Purpose:** Create a new user account and establish session.
-- **Auth:** Public.
-- **Validation Schema (Zod):**
+- **Auth:** public.
+- **Validation (Zod):**
   ```typescript
   z.object({
-    fullName: z.string().min(2).max(100),
-    email: z.string().email().toLowerCase().trim(),
-    password: z.string().min(8).max(100).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must include upper, lower, and numeric characters"),
-    targetRole: z.string().max(100).optional(),
+    fullName: z.string().trim().min(2).max(100),
+    email: z.string().trim().toLowerCase().email(),
+    password: z.string().min(8).max(100).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
+    targetRole: z.string().trim().min(2).max(100).optional(),
   })
   ```
-- **Request Body Example:**
-  ```json
-  {
-    "fullName": "Jane Developer",
-    "email": "jane@example.com",
-    "password": "SecurePassword123",
-    "targetRole": "Junior Full-Stack Developer"
-  }
-  ```
-- **Success Response (201 Created):**
-  - Sets `httpOnly` `access_token` and `refresh_token` cookies.
+- **Success (201):** sets `access_token` and `refresh_token` cookies and returns the user.
   ```json
   {
     "success": true,
@@ -140,209 +123,180 @@ All API responses use a predictable, standardized envelope containing a boolean 
         "email": "jane@example.com",
         "fullName": "Jane Developer",
         "role": "USER",
-        "targetRole": "Junior Full-Stack Developer"
+        "targetRole": "Junior Full-Stack Developer",
+        "careerLevel": "ENTRY",
+        "createdAt": "2026-10-17T21:30:00.000Z"
       }
     },
     "meta": { "timestamp": "2026-10-17T21:30:00.000Z" }
   }
   ```
-- **Error Responses:** `400 Bad Request` (validation issue), `409 Conflict` ("Email already registered").
-- **Database Operations:** `prisma.user.create()`, `prisma.refreshToken.create()`.
-
----
+- **Errors:** `400` (validation), `409` ("Email already registered").
 
 #### `POST /api/v1/auth/login`
-- **Purpose:** Authenticate an existing user with email and password.
-- **Auth:** Public.
-- **Request Body Example:**
-  ```json
-  {
-    "email": "jane@example.com",
-    "password": "SecurePassword123"
-  }
-  ```
-- **Success Response (200 OK):** Sets cookies; returns user profile object.
-- **Error Responses:** `401 Unauthorized` ("Invalid email or password").
-- **Database Operations:** `prisma.user.findUnique()`, `prisma.refreshToken.create()`.
-
----
+- **Auth:** public.
+- **Body:** `{ "email": "...", "password": "..." }`.
+- **Success (200):** sets cookies and returns the user.
+- **Errors:** `401` ("Invalid email or password").
 
 #### `POST /api/v1/auth/demo`
-- **Purpose:** Provide one-click demo login for assessment review.
-- **Auth:** Public.
-- **Business Logic:** Finds or provisions `demo@careerpilot.internal` with a pre-hashed password, issues valid session cookies, and returns the demo user.
+- **Auth:** public.
+- **Behavior:** finds or provisions `demo@careerpilot.internal`, issues session cookies, and returns the demo user.
 
----
+#### `POST /api/v1/auth/refresh`
+- **Auth:** public (reads the `refresh_token` cookie).
+- **Behavior:** validates the stored refresh token, revokes it, issues a new token pair, and sets cookies.
 
 #### `POST /api/v1/auth/logout`
-- **Purpose:** Invalidate session and revoke refresh token.
-- **Auth:** Authenticated (`access_token` or `refresh_token` cookie required).
-- **Success Response (200 OK):** Clears cookies; returns `{ "message": "Successfully logged out" }`.
-- **Database Operations:** `prisma.refreshToken.updateMany({ where: { tokenHash }, data: { isRevoked: true } })`.
+- **Auth:** public (reads the `refresh_token` cookie if present).
+- **Behavior:** revokes the refresh token and clears cookies. Returns `{ "data": { "message": "Successfully logged out" } }`.
 
----
+#### `GET /api/v1/auth/me`
+- **Auth:** required.
+- **Success (200):** returns the current user.
 
-### 3.2 Resume Management Group
+### 3.2 Resumes
 
 #### `POST /api/v1/resumes`
-- **Purpose:** Create and store a new resume.
-- **Auth:** Authenticated.
-- **Validation Schema (Zod):**
+- **Auth:** required.
+- **Validation (Zod):**
   ```typescript
   z.object({
-    title: z.string().min(3).max(150),
-    targetRole: z.string().max(100).optional(),
-    content: z.string().min(100, "Resume must contain at least 100 characters").max(20000),
+    title: z.string().trim().min(3).max(150),
+    targetRole: z.string().trim().min(2).max(100).optional(),
+    content: z.string().min(100).max(20000),
     isPrimary: z.boolean().optional(),
   })
   ```
-- **Request Body Example:**
-  ```json
-  {
-    "title": "Full-Stack Web Dev Resume",
-    "targetRole": "Full-Stack Engineer",
-    "content": "JANE DEVELOPER\nFull-Stack Engineer with experience in React, Node.js, TypeScript...",
-    "isPrimary": true
-  }
-  ```
-- **Success Response (201 Created):**
-  ```json
-  {
-    "success": true,
-    "data": {
-      "id": "e4f5a6b7-c8d9-0123-ef45-6789abcdef01",
-      "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "title": "Full-Stack Web Dev Resume",
-      "targetRole": "Full-Stack Engineer",
-      "isPrimary": true,
-      "createdAt": "2026-10-17T21:30:00.000Z"
-    },
-    "meta": { "timestamp": "2026-10-17T21:30:00.000Z" }
-  }
-  ```
-- **Database Operations:** `prisma.resume.create()`. If `isPrimary: true`, updates other user resumes in transaction setting `isPrimary: false`.
-
----
+- **Success (201):** returns the created resume. If `isPrimary: true`, other resumes are unset in the same transaction.
+- **Errors:** `400` (validation).
 
 #### `GET /api/v1/resumes`
-- **Purpose:** Retrieve all resumes owned by the authenticated user.
-- **Auth:** Authenticated.
-- **Authorization Rule:** `WHERE userId = req.user.id`.
-- **Success Response (200 OK):** Array of resume summaries (excluding large `content` text if querying list).
+- **Auth:** required.
+- **Behavior:** returns list summaries (id, title, targetRole, isPrimary, timestamps), ordered by `isPrimary` then `createdAt`. The large `content` field is omitted.
 
----
+#### `GET /api/v1/resumes/:id`, `PUT /api/v1/resumes/:id`, `DELETE /api/v1/resumes/:id`
+- **Auth:** required; ownership enforced (`userId = req.user.id`).
+- **Errors:** `404` if the resume does not exist or belongs to another user.
 
-### 3.3 Flagship AI Feature: Resume–Job Gap Analysis Group
+### 3.3 Job descriptions
+
+#### `POST /api/v1/jobs`
+- **Auth:** required.
+- **Validation (Zod):**
+  ```typescript
+  z.object({
+    title: z.string().trim().min(2).max(150),
+    company: z.string().trim().min(2).max(150),
+    experienceLevel: z.enum(['ENTRY', 'JUNIOR', 'MID', 'SENIOR', 'LEAD']).optional(),
+    rawText: z.string().min(100).max(20000),
+  })
+  ```
+
+#### `GET /api/v1/jobs`, `GET /api/v1/jobs/:id`, `DELETE /api/v1/jobs/:id`
+- **Auth:** required; ownership enforced.
+
+### 3.4 Gap analysis
 
 #### `POST /api/v1/analyses`
-- **Purpose:** Perform comprehensive AI-powered qualification matching and skill gap analysis.
-- **Auth:** Authenticated.
-- **Validation Schema (Zod):**
+- **Auth:** required.
+- **Validation (Zod):**
   ```typescript
   z.object({
     resumeId: z.string().uuid().optional(),
     resumeContent: z.string().min(100).max(20000).optional(),
-    jobTitle: z.string().min(2).max(150),
-    company: z.string().min(2).max(150),
+    jobTitle: z.string().trim().min(2).max(150),
+    company: z.string().trim().min(2).max(150),
     jobDescriptionText: z.string().min(100).max(20000),
+    experienceLevel: z.enum(['ENTRY', 'JUNIOR', 'MID', 'SENIOR', 'LEAD']).optional(),
   }).refine((data) => data.resumeId || data.resumeContent, {
-    message: "Either resumeId or resumeContent must be provided",
+    message: 'Either resumeId or resumeContent must be provided',
   })
   ```
-- **Request Body Example:**
+- **Request example:**
   ```json
   {
     "resumeId": "e4f5a6b7-c8d9-0123-ef45-6789abcdef01",
     "jobTitle": "Junior Backend Developer",
     "company": "FinTech Innovators Inc.",
+    "experienceLevel": "JUNIOR",
     "jobDescriptionText": "Looking for a Junior Backend Developer proficient in Node.js, Express, PostgreSQL, Prisma, and REST APIs. Experience with Docker and Redis is a plus."
   }
   ```
-- **Success Response (201 Created):**
+- **Success (201):**
   ```json
   {
     "success": true,
     "data": {
       "id": "f7a8b9c0-1234-5678-90ab-cdef12345678",
+      "resumeId": "e4f5a6b7-c8d9-0123-ef45-6789abcdef01",
+      "jobDescriptionId": "d2c1b0a9-...",
       "overallScore": 78,
       "skillScore": 82,
       "experienceScore": 70,
       "summary": "Strong alignment with core backend technologies (Node.js, Express, PostgreSQL). Gaps identified in containerization (Docker) and caching mechanisms.",
       "matchedSkills": [
         { "name": "Node.js", "category": "FRAMEWORK", "relevance": "HIGH" },
-        { "name": "PostgreSQL", "category": "DATABASE", "relevance": "HIGH" },
-        { "name": "REST APIs", "category": "CONCEPT", "relevance": "HIGH" }
+        { "name": "PostgreSQL", "category": "DATABASE", "relevance": "HIGH" }
       ],
       "missingRequiredSkills": [
-        { "name": "Prisma", "category": "TOOL", "relevance": "HIGH", "contextualNote": "Required for ORM data layer" }
+        { "name": "Prisma", "category": "TOOL", "relevance": "HIGH", "contextualNote": "Required for the ORM data layer." }
       ],
       "missingPreferredSkills": [
-        { "name": "Docker", "category": "DEVOPS", "relevance": "MEDIUM", "contextualNote": "Bonus qualification in posting" }
+        { "name": "Docker", "category": "DEVOPS", "relevance": "MEDIUM", "contextualNote": "Bonus qualification in posting." }
       ],
       "recommendations": [
         {
           "category": "SKILL_INTEGRATION",
-          "action": "Highlight Prisma ORM experience in projects section to address explicit requirement.",
-          "priority": "HIGH"
+          "priority": "HIGH",
+          "improved": "Highlight Prisma ORM experience in the projects section to address the explicit requirement.",
+          "rationale": "The posting lists Prisma as a mandatory data-layer requirement."
         },
         {
           "category": "BULLET_POINT_REWRITE",
-          "original": "Built backend APIs for web application using Express and SQL database.",
+          "priority": "HIGH",
+          "original": "Built backend APIs for a web application using Express and a SQL database.",
           "improved": "Architected resilient REST API endpoints using Express and PostgreSQL, handling relational transactions and reducing query latency by 25%.",
           "rationale": "Incorporates exact job keywords and quantifies engineering impact."
         }
-      ]
+      ],
+      "modelVersion": "hybrid-v1:gemini-2.5-flash",
+      "createdAt": "2026-10-17T21:30:00.000Z"
     },
     "meta": { "timestamp": "2026-10-17T21:30:00.000Z" }
   }
   ```
-- **Business Logic & Persistence:**
-  1. Authenticates user and verifies resume ownership (`resume.userId === req.user.id`).
-  2. Runs deterministic exact match against canonical skills dictionary.
-  3. Sends sanitized payload to Gemini API with strict JSON schema.
-  4. Validates returned AI response via Zod.
-  5. Commits `JobDescription`, `ResumeAnalysis`, and `AnalysisSkill` rows in a single atomic `prisma.$transaction`.
-- **Error Responses:** `400 Bad Request`, `403 Forbidden` (not resume owner), `429 Too Many Requests`, `503 Service Unavailable` (AI API error).
+- **Behavior:**
+  1. Verify resume ownership (or use inline `resumeContent`).
+  2. Run deterministic exact matching against the canonical skill catalog.
+  3. Call Gemini with the structured JSON schema.
+  4. Validate the AI response with Zod and reconcile it with deterministic results.
+  5. Persist `JobDescription`, `ResumeAnalysis`, and `AnalysisSkill` rows in one `prisma.$transaction`.
+- **Errors:** `400`, `404` (resume not found/not owned), `503` (AI error).
 
----
+#### `GET /api/v1/analyses` (paginated), `GET /api/v1/analyses/:id`, `DELETE /api/v1/analyses/:id`
+- **Auth:** required; ownership enforced.
 
-#### `GET /api/v1/analyses/:id`
-- **Purpose:** Retrieve full analysis record with skill breakdown and recommendations.
-- **Auth:** Authenticated.
-- **Authorization Rule:** `WHERE id = req.params.id AND userId = req.user.id`.
-- **Success Response (200 OK):** Returns complete analysis details including joined `AnalysisSkill` and `JobDescription` models.
-
----
-
-### 3.4 Career Roadmap Group
+### 3.5 Roadmaps
 
 #### `POST /api/v1/roadmaps`
-- **Purpose:** Generate a customized career roadmap and phased milestone tasks.
-- **Auth:** Authenticated.
-- **Validation Schema (Zod):**
+- **Auth:** required.
+- **Validation (Zod):**
   ```typescript
   z.object({
-    analysisId: z.string().uuid().optional(),
-    targetRole: z.string().min(2).max(100),
-    timeframe: z.enum(["3_MONTHS", "6_MONTHS", "12_MONTHS"]).default("6_MONTHS"),
+    analysisId: z.string().uuid(),
+    targetRole: z.string().trim().min(2).max(100),
+    timeframe: z.enum(['3_MONTHS', '6_MONTHS', '12_MONTHS']).default('6_MONTHS'),
   })
   ```
-- **Success Response (201 Created):** Returns generated `CareerRoadmap` containing nested `RoadmapTask` records grouped into phases.
-- **Database Operations:** Atomic transaction creating `CareerRoadmap` and all `RoadmapTask` rows.
-
----
+  `analysisId` is required: the roadmap is generated from the skill gaps recorded in that analysis.
+- **Success (201):** returns the `CareerRoadmap` with nested, phase-grouped `RoadmapTask` records.
+- **Behavior:** validates the analysis belongs to the user, generates phases with Gemini, then creates the roadmap and tasks in a transaction.
 
 #### `PATCH /api/v1/roadmaps/tasks/:taskId`
-- **Purpose:** Toggle the completion status of a roadmap task.
-- **Auth:** Authenticated.
-- **Authorization Rule:** Verifies task belongs to a roadmap owned by `req.user.id`.
-- **Validation Schema (Zod):**
-  ```typescript
-  z.object({
-    isCompleted: z.boolean(),
-  })
-  ```
-- **Success Response (200 OK):**
+- **Auth:** required; verifies the task belongs to a roadmap owned by the user.
+- **Validation (Zod):** `z.object({ isCompleted: z.boolean() })`.
+- **Success (200):**
   ```json
   {
     "success": true,
@@ -361,16 +315,18 @@ All API responses use a predictable, standardized envelope containing a boolean 
 
 ---
 
-## 4. Critical API Test Cases & Scenarios
+## 4. Key API Test Scenarios
 
-| Test Case Identifier | Method & Path | Input Condition | Expected Status | Verification Objective |
+These map to the actual integration tests in `backend/tests/`.
+
+| ID | Endpoint | Input | Expected | Checks |
 | :--- | :--- | :--- | :---: | :--- |
-| **TC-API-AUTH-01** | `POST /auth/register` | Valid unique email, strong password | `201 Created` | Verifies user creation, bcrypt hash, and cookie header generation. |
-| **TC-API-AUTH-02** | `POST /auth/register` | Duplicate email address | `409 Conflict` | Verifies unique constraint handling without crashing. |
-| **TC-API-AUTH-03** | `POST /auth/login` | Incorrect password | `401 Unauthorized` | Verifies credential rejection and generic security message. |
-| **TC-API-AUTH-04** | `GET /resumes` | Request without cookie | `401 Unauthorized` | Verifies authentication middleware gatekeeper. |
-| **TC-API-AUTH-05** | `GET /analyses/:id` | Valid token from User A, requesting User B's analysis | `403 Forbidden` / `404 Not Found` | Verifies multi-tenant cross-user authorization protection. |
-| **TC-API-VAL-01** | `POST /analyses` | `resumeContent` < 100 characters | `400 Bad Request` | Verifies Zod field validation and error format. |
-| **TC-API-AI-01** | `POST /analyses` | Valid resume and job text | `201 Created` | Verifies end-to-end Gemini integration, schema validation, and DB transaction. |
-| **TC-API-AI-02** | `POST /analyses` | Gemini API simulated quota exhaustion (`429`) | `503 Service Unavailable` | Verifies clean failure envelope instead of uncaught crash or fake mock response. |
-| **TC-API-TASK-01** | `PATCH /roadmaps/tasks/:id` | Valid task toggle | `200 OK` | Verifies atomic task status update and recalculated progress percentage. |
+| **AUTH-01** | `POST /auth/register` | Valid unique email, strong password | `201` | User creation, bcrypt hash, cookies set. |
+| **AUTH-02** | `POST /auth/register` | Duplicate email | `409` | Unique constraint handled cleanly. |
+| **AUTH-03** | `POST /auth/login` | Incorrect password | `401` | Credential rejection with a generic message. |
+| **AUTH-04** | `GET /resumes` | No cookie | `401` | Auth middleware blocks the request. |
+| **AUTH-05** | `GET /analyses/:id` | User A requests User B's analysis | `404` | Cross-tenant authorization. |
+| **VAL-01** | `POST /analyses` | `resumeContent` < 100 chars | `400` | Zod validation and error format. |
+| **AI-01** | `POST /analyses` | Valid resume and job text | `201` | End-to-end AI integration, schema validation, transaction. |
+| **AI-02** | `POST /analyses` | Gemini quota/outage | `503` | Clean error envelope, no mock data. |
+| **TASK-01** | `PATCH /roadmaps/tasks/:id` | Valid toggle | `200` | Task update and recalculated progress. |

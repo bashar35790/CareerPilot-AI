@@ -1,23 +1,23 @@
 # CareerPilot AI
 
-> **An AI-powered career development and job-alignment platform.**
-> Score your resume against real job postings, uncover missing skills, receive actionable
-> bullet-point rewrites, and generate a phased learning roadmap that closes the gaps.
+An AI-powered career development and job-alignment platform.
+Score your resume against real job postings, uncover missing skills, get actionable
+bullet-point rewrites, and generate a phased learning roadmap that closes the gaps.
 
-**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Express · PostgreSQL · Prisma ORM · Google Gemini (`gemini-2.5-flash`)
+**Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Express, PostgreSQL, Prisma ORM, Google Gemini (`gemini-2.5-flash`)
 
 ---
 
 ## 1. Overview
 
-Early-career developers rarely learn *why* an application was rejected. CareerPilot AI makes that transparent:
+Early-career developers rarely learn why an application was rejected. CareerPilot AI makes that transparent:
 
 1. **Ingest a resume** and **a target job posting**.
-2. Run a **hybrid Resume–Job gap analysis** (deterministic taxonomy matching + Gemini semantic reasoning).
+2. Run a **hybrid Resume-Job gap analysis** (deterministic taxonomy matching plus Gemini semantic reasoning).
 3. Review an explainable **match score**, color-coded **skill badges** (matched / missing required / missing preferred), and **rewrites** of weak bullet points.
 4. Generate a **phased career roadmap** from the identified gaps and track task completion with live progress.
 
-The flagship AI feature is a **Resume–Job Matching & Skill Gap Engine**. See [docs/AI_FEATURE.md](docs/AI_FEATURE.md) for inputs, outputs, limitations, and the measured evaluation results.
+The flagship feature is the **Resume-Job Matching & Skill Gap Engine**. See [docs/AI_FEATURE.md](docs/AI_FEATURE.md) for inputs, outputs, limitations, and the benchmark results.
 
 ---
 
@@ -37,12 +37,12 @@ The flagship AI feature is a **Resume–Job Matching & Skill Gap Engine**. See [
 
 ## 3. Features
 
-- **Authentication** — register, login, one-click demo login, silent token refresh, logout, protected routes.
-- **Resume management** — full CRUD with character validation (100–20,000 chars) and a primary resume concept.
-- **Job posting ingestion** — store target postings with experience-level classification.
-- **Gap analysis** — hybrid scoring (Skills 55% / Experience 35% / Completeness 10%), skill-gap badges, AI summary, Google-XYZ bullet rewrites, paginated report history.
-- **Career roadmaps** — AI-generated phased plans with toggleable tasks and live progress recalculation.
-- **Dashboard** — quick access to resumes, jobs, and analysis.
+- **Authentication** - register, login, one-click demo login, silent token refresh, logout, protected routes.
+- **Resume management** - full CRUD with character validation (100-20,000 chars) and a primary resume concept.
+- **Job posting ingestion** - store target postings with experience-level classification.
+- **Gap analysis** - hybrid scoring (Skills 55% / Experience 35% / Completeness 10%), skill-gap badges, AI summary, Google-XYZ bullet rewrites, paginated report history.
+- **Career roadmaps** - AI-generated phased plans with toggleable tasks and live progress recalculation.
+- **Dashboard** - quick access to resumes, jobs, and analysis.
 
 ---
 
@@ -83,7 +83,7 @@ npm install
 npm run dev                   # http://localhost:3000
 ```
 
-Open **http://localhost:3000** and click **“Try the demo”** (or use the credentials in §6).
+Open **http://localhost:3000** and click **"Try the demo"** (or use the credentials in §6).
 
 > **Alternative:** run the whole stack in Docker with `docker compose up --build`.
 
@@ -91,7 +91,7 @@ Open **http://localhost:3000** and click **“Try the demo”** (or use the cred
 
 ## 5. Environment Variables
 
-### Backend (`backend/.env`) — see [`backend/.env.example`](backend/.env.example)
+### Backend (`backend/.env`) - see [`backend/.env.example`](backend/.env.example)
 ```env
 PORT=5000
 NODE_ENV=development
@@ -115,7 +115,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 FRONTEND_URL=http://localhost:3000
 ```
 
-### Frontend (`frontend/.env`) — see [`frontend/.env.example`](frontend/.env.example)
+### Frontend (`frontend/.env`) - see [`frontend/.env.example`](frontend/.env.example)
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
 ```
@@ -129,24 +129,24 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
 | Email | `demo@careerpilot.internal` |
 | Password | `DemoPassword123!` |
 
-The **“Try the demo”** button performs a one-click login through `POST /api/v1/auth/demo` and auto-provisions/seeds the reviewer account. Running `npm run db:seed` additionally pre-loads a sample resume and job posting for the demo user.
+The **"Try the demo"** button performs a one-click login through `POST /api/v1/auth/demo` and auto-provisions the reviewer account. Running `npm run db:seed` also pre-loads a sample resume and job posting for the demo user.
 
 ---
 
-## 7. AI Feature — Resume–Job Matching Engine
+## 7. AI Feature - Resume-Job Matching Engine
 
-**Inputs:** resume text (100–20,000 chars), job description text, and the canonical skill taxonomy (73 technologies).
-**Outputs:** `overallScore`, `skillScore`, `experienceScore` (0–100), categorized skill badges (`MATCHED`, `MISSING_REQUIRED`, `MISSING_PREFERRED`), an AI summary, and prioritized bullet-point rewrites.
+**Inputs:** resume text (100-20,000 chars), job description text, and the canonical skill taxonomy (73 technologies).
+**Outputs:** `overallScore`, `skillScore`, `experienceScore` (0-100), categorized skill badges (`MATCHED`, `MISSING_REQUIRED`, `MISSING_PREFERRED`), an AI summary, and prioritized bullet-point rewrites.
 **Approach:** a **deterministic exact-match layer** over a canonical taxonomy (grounds hard skills) combined with **Gemini semantic reasoning** (seniority, nuance, recommendations), reconciled before persistence.
-**Known limitations:** LLM scores can vary slightly between runs (mitigated by schema + `temperature 0.2` + deterministic grounding); image-only PDFs must be text-extracted before ingestion; soft skills cannot be verified without explicit textual evidence.
+**Known limitations:** LLM scores can vary slightly between runs (mitigated by schema validation, `temperature 0.2`, and deterministic grounding); image-only PDFs must be text-extracted before ingestion; soft skills cannot be verified without explicit textual evidence.
 
-**Measured evaluation** (10 human-annotated benchmark pairs, `npm run eval:matching`):
+**Benchmark results** (10 annotated pairs, `npm run eval:matching`):
 
 | Metric | Target | Measured |
 | :--- | :---: | :---: |
-| Skill extraction precision | ≥ 90% | **100.0%** |
-| Skill extraction recall | ≥ 85% | **100.0%** |
-| Missing-skill accuracy | ≥ 90% | **100.0%** |
+| Skill extraction precision | >= 90% | **100.0%** |
+| Skill extraction recall | >= 85% | **100.0%** |
+| Missing-skill accuracy | >= 90% | **100.0%** |
 | Deterministic latency / pair | < 4.5 s | ~0.6 ms |
 
 Full specification: [docs/AI_FEATURE.md](docs/AI_FEATURE.md).
@@ -171,7 +171,7 @@ npm run typecheck
 npm run lint
 ```
 
-The suites cover: authentication & token rotation, cross-tenant ownership isolation, resume/job/analysis CRUD, the E2E journey (register -> resume -> job -> analysis -> roadmap), OWASP-aligned security checks, log hygiene, the matching algorithm, Gemini wrapper retries/fallback, and roadmap progress.
+The suites cover authentication and token rotation, cross-tenant ownership isolation, resume/job/analysis CRUD, the end-to-end journey (register -> resume -> job -> analysis -> roadmap), security checks, log redaction, the matching algorithm, Gemini wrapper retries/fallback, and roadmap progress.
 
 ---
 
@@ -182,14 +182,14 @@ Base path: `/api/v1` (all non-auth routes require an authenticated cookie sessio
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | GET | `/health` | Service health probe |
-| POST | `/auth/register` · `/auth/login` · `/auth/demo` · `/auth/refresh` · `/auth/logout` | Authentication lifecycle |
+| POST | `/auth/register`, `/auth/login`, `/auth/demo`, `/auth/refresh`, `/auth/logout` | Authentication lifecycle |
 | GET | `/auth/me` | Current session user |
-| GET/POST | `/resumes` · `/resumes/:id` (PUT/DELETE) | Resume CRUD |
-| GET/POST | `/jobs` · `/jobs/:id` (GET/DELETE) | Job posting CRUD |
+| GET/POST | `/resumes`; `/resumes/:id` (GET/PUT/DELETE) | Resume CRUD |
+| GET/POST | `/jobs`; `/jobs/:id` (GET/DELETE) | Job posting CRUD |
 | GET/PUT | `/users/profile` | Profile + dashboard statistics |
-| GET/POST | `/analyses` · `/analyses/:id` (GET/DELETE) | Run / list / fetch gap analyses |
-| GET/POST | `/roadmaps` · `/roadmaps/:id` (GET) | Generate / list / fetch roadmaps |
-| PATCH | `/roadmaps/tasks/:taskId` | Toggle task completion & recompute progress |
+| GET/POST | `/analyses`; `/analyses/:id` (GET/DELETE) | Run / list / fetch gap analyses |
+| GET/POST | `/roadmaps`; `/roadmaps/:id` (GET) | Generate / list / fetch roadmaps |
+| PATCH | `/roadmaps/tasks/:taskId` | Toggle task completion and recompute progress |
 
 Full contract: [docs/API_SPECIFICATION.md](docs/API_SPECIFICATION.md).
 
@@ -215,6 +215,7 @@ CareerPilot-AI/
 │       ├── app/           # App Router pages (home, auth, dashboard, resumes, jobs, analysis, roadmaps)
 │       ├── components/    # ui primitives, layout, home, analysis charts
 │       ├── schemas/       # client-side validation
+│       ├── proxy.ts       # route protection (Next.js proxy)
 │       └── lib/ · store/  # API client, auth context
 ├── docs/                  # planning & design documentation
 └── docker-compose.yml
@@ -240,21 +241,21 @@ CareerPilot-AI/
 
 ### 12.1 Main user flow (3-5 minutes)
 1. **Demo login** -> authenticated dashboard.
-2. **Resume** - show the seeded resume or create one (validation 100–20,000 chars).
+2. **Resume** - show the seeded resume or create one (validation 100-20,000 chars).
 3. **Job posting** - ingest a real posting.
-4. **Run analysis** - show the loading skeleton -> overall score, sub-scores, skill badges, rewrites.
+4. **Run analysis** - show the loading state, then the overall score, sub-scores, skill badges, and rewrites.
 5. **Roadmap** - check off a task and show the live progress update.
 
 ### 12.2 Architecture defense
 - **Database:** PostgreSQL over NoSQL for ACID guarantees, foreign keys enforcing multi-tenant isolation, and normalized `Skill` / `AnalysisSkill` join tables for cross-analysis aggregation.
 - **Auth:** HttpOnly signed cookies with refresh-token rotation over `localStorage` JWTs (immune to XSS token theft; server-side revocability).
-- **AI:** hybrid architecture — deterministic taxonomy matching for hard-skill precision + Gemini for semantic reasoning and structured JSON output.
+- **AI:** hybrid architecture - deterministic taxonomy matching for hard-skill precision plus Gemini for semantic reasoning and structured JSON output.
 
 ### 12.3 Likely live changes
-- **Scoring weights** → edit `SCORE_WEIGHTS` in [`backend/src/services/matching.reconciliation.ts`](backend/src/services/matching.reconciliation.ts) and rerun `npm test` (`tests/unit/matching.reconciliation.test.ts`).
-- **New validation rule** → edit the relevant Zod schema in `backend/src/schemas/` (e.g. `resume.schema.ts`) and observe the `400` response.
-- **Roadmap endpoint change** → extend `backend/src/controllers/roadmap.controller.ts` and its Prisma query.
-- **Debugging** → inspect `errorHandler.ts` logs and verify ownership filters (`userId: req.user.id`).
+- **Scoring weights** -> edit `SCORE_WEIGHTS` in [`backend/src/services/matching.reconciliation.ts`](backend/src/services/matching.reconciliation.ts) and rerun `npm test` (`tests/unit/matching.reconciliation.test.ts`).
+- **New validation rule** -> edit the relevant Zod schema in `backend/src/schemas/` (e.g. `resume.schema.ts`) and observe the `400` response.
+- **Roadmap endpoint change** -> extend `backend/src/controllers/roadmap.controller.ts` and its Prisma query.
+- **Debugging** -> inspect `errorHandler.ts` logs and verify ownership filters (`userId: req.user.id`).
 
 ---
 
@@ -269,4 +270,4 @@ CareerPilot-AI/
 
 ## 14. Author
 
-**Abul Bashar** — Full-Stack Developer Assessment (NT Tech Innovation), October 2026.
+**Abul Bashar** - Full-Stack Developer Assessment (NT Tech Innovation), October 2026.

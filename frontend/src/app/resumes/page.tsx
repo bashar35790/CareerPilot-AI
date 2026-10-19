@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Calendar,
   Check,
@@ -11,9 +11,9 @@ import {
   Sparkles,
   Star,
   Trash2,
-} from 'lucide-react';
-import { api, getApiErrorMessage } from '@/lib/api';
-import { ApiResponse, Resume, ResumeSummary } from '@/types';
+} from "lucide-react";
+import { api, getApiErrorMessage } from "@/lib/api";
+import { ApiResponse, Resume, ResumeSummary } from "@/types";
 import {
   Badge,
   CardSkeleton,
@@ -21,8 +21,8 @@ import {
   EmptyState,
   Modal,
   useToast,
-} from '@/components/ui';
-import { createResumeSchema } from '@/schemas/resume.schema';
+} from "@/components/ui";
+import { createResumeSchema } from "@/schemas/resume.schema";
 
 const SAMPLE_RESUME_TEXT = `ALEX DEVELOPER
 Full-Stack Software Engineer
@@ -52,7 +52,7 @@ Career Alignment & ATS Match Engine
 - Implemented automated Vitest test suite achieving 92% coverage across business logic services.`;
 
 const inputBase =
-  'block w-full rounded-lg border bg-white/5 px-3.5 py-2 text-sm text-white placeholder:text-neutral-500 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500';
+  "block w-full rounded-lg border bg-white/5 px-3.5 py-2 text-sm text-white placeholder:text-neutral-500 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500";
 
 export default function ResumesPage() {
   const toast = useToast();
@@ -64,13 +64,15 @@ export default function ResumesPage() {
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [isViewLoading, setIsViewLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmTarget, setConfirmTarget] = useState<ResumeSummary | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ResumeSummary | null>(
+    null,
+  );
 
   // Form State
   const [formData, setFormData] = useState({
-    title: '',
-    targetRole: '',
-    content: '',
+    title: "",
+    targetRole: "",
+    content: "",
     isPrimary: false,
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -79,12 +81,12 @@ export default function ResumesPage() {
     try {
       setIsLoading(true);
       const response =
-        await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>('/resumes');
+        await api.get<ApiResponse<{ resumes: ResumeSummary[] }>>("/resumes");
       if (response.data.success && response.data.data) {
         setResumes(response.data.data.resumes);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to load resumes.'));
+      toast.error(getApiErrorMessage(error, "Failed to load resumes."));
     } finally {
       setIsLoading(false);
     }
@@ -96,9 +98,9 @@ export default function ResumesPage() {
 
   const handleOpenCreateModal = () => {
     setFormData({
-      title: '',
-      targetRole: '',
-      content: '',
+      title: "",
+      targetRole: "",
+      content: "",
       isPrimary: resumes.length === 0, // Default to primary if first resume
     });
     setFieldErrors({});
@@ -112,8 +114,8 @@ export default function ResumesPage() {
 
   const handleLoadSample = () => {
     setFormData({
-      title: 'Full-Stack Developer Resume',
-      targetRole: 'Junior Full-Stack Engineer',
+      title: "Full-Stack Developer Resume",
+      targetRole: "Junior Full-Stack Engineer",
       content: SAMPLE_RESUME_TEXT,
       isPrimary: resumes.length === 0,
     });
@@ -140,16 +142,16 @@ export default function ResumesPage() {
     setIsSubmitting(true);
     try {
       const response = await api.post<ApiResponse<{ resume: Resume }>>(
-        '/resumes',
+        "/resumes",
         validationResult.data,
       );
       if (response.data.success && response.data.data?.resume) {
-        toast.success('Resume saved successfully!');
+        toast.success("Resume saved successfully!");
         handleCloseModal();
         fetchResumes();
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to save resume.'));
+      toast.error(getApiErrorMessage(error, "Failed to save resume."));
     } finally {
       setIsSubmitting(false);
     }
@@ -162,7 +164,7 @@ export default function ResumesPage() {
       fetchResumes();
     } catch (error) {
       toast.error(
-        getApiErrorMessage(error, 'Failed to update primary status.'),
+        getApiErrorMessage(error, "Failed to update primary status."),
       );
     }
   };
@@ -177,7 +179,7 @@ export default function ResumesPage() {
         setSelectedResume(response.data.data.resume);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to load resume.'));
+      toast.error(getApiErrorMessage(error, "Failed to load resume."));
     } finally {
       setIsViewLoading(false);
     }
@@ -190,14 +192,14 @@ export default function ResumesPage() {
     setDeletingId(id);
     try {
       await api.delete(`/resumes/${id}`);
-      toast.success('Resume deleted successfully.');
+      toast.success("Resume deleted successfully.");
       if (selectedResume?.id === id) {
         setSelectedResume(null);
       }
       setConfirmTarget(null);
       fetchResumes();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to delete resume.'));
+      toast.error(getApiErrorMessage(error, "Failed to delete resume."));
     } finally {
       setDeletingId(null);
     }
@@ -216,7 +218,7 @@ export default function ResumesPage() {
               Resume Management
             </h1>
             <Badge variant="info" size="sm">
-              {resumes.length} {resumes.length === 1 ? 'Resume' : 'Resumes'}
+              {resumes.length} {resumes.length === 1 ? "Resume" : "Resumes"}
             </Badge>
           </div>
           <p className="mt-1 text-sm text-neutral-400">
@@ -269,8 +271,8 @@ export default function ResumesPage() {
                 key={resume.id}
                 className={`relative flex flex-col justify-between rounded-2xl border bg-white/5 p-6 shadow-xs transition-all hover:bg-white/10 ${
                   resume.isPrimary
-                    ? 'border-blue-500/40 ring-2 ring-blue-500/20'
-                    : 'border-white/10 hover:border-white/20'
+                    ? "border-blue-500/40 ring-2 ring-blue-500/20"
+                    : "border-white/10 hover:border-white/20"
                 }`}
               >
                 <div>
@@ -281,7 +283,9 @@ export default function ResumesPage() {
                         Primary Resume
                       </Badge>
                     ) : (
-                      <span className="text-xs text-neutral-500">Secondary</span>
+                      <span className="text-xs text-neutral-500">
+                        Secondary
+                      </span>
                     )}
 
                     <span className="flex items-center gap-1 text-[11px] text-neutral-500">
@@ -295,7 +299,7 @@ export default function ResumesPage() {
                     {resume.title}
                   </h3>
                   <p className="mt-0.5 line-clamp-1 text-xs font-medium text-neutral-400">
-                    {resume.targetRole || 'General Engineering Role'}
+                    {resume.targetRole || "General Engineering Role"}
                   </p>
 
                   {/* Meta */}
@@ -383,7 +387,7 @@ export default function ResumesPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4 p-2" noValidate>
           {/* Title */}
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
@@ -398,8 +402,8 @@ export default function ResumesPage() {
               placeholder="e.g. Full-Stack Software Engineer CV"
               className={`${inputBase} ${
                 fieldErrors.title
-                  ? 'border-rose-400/60 bg-rose-500/10'
-                  : 'border-white/10'
+                  ? "border-rose-400/60 bg-rose-500/10"
+                  : "border-white/10"
               }`}
             />
             {fieldErrors.title && (
@@ -410,7 +414,7 @@ export default function ResumesPage() {
           {/* Target Role */}
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-300">
-              Target Role{' '}
+              Target Role{" "}
               <span className="font-normal lowercase text-neutral-500">
                 (optional)
               </span>
@@ -436,14 +440,14 @@ export default function ResumesPage() {
               <span
                 className={`font-mono text-xs font-medium ${
                   charCount === 0
-                    ? 'text-neutral-500'
+                    ? "text-neutral-500"
                     : isContentValid
-                      ? 'text-emerald-400'
-                      : 'text-rose-400'
+                      ? "text-emerald-400"
+                      : "text-rose-400"
                 }`}
               >
-                {charCount.toLocaleString()} / 20,000 characters{' '}
-                {charCount > 0 && charCount < 100 && '(min 100 required)'}
+                {charCount.toLocaleString()} / 20,000 characters{" "}
+                {charCount > 0 && charCount < 100 && "(min 100 required)"}
               </span>
             </div>
             <textarea
@@ -455,8 +459,8 @@ export default function ResumesPage() {
               placeholder="Paste your plain-text or Markdown resume here (e.g. Summary, Skills, Work Experience, Projects)..."
               className={`${inputBase} font-mono text-xs ${
                 fieldErrors.content
-                  ? 'border-rose-400/60 bg-rose-500/10'
-                  : 'border-white/10'
+                  ? "border-rose-400/60 bg-rose-500/10"
+                  : "border-white/10"
               }`}
             />
             {fieldErrors.content && (
@@ -519,10 +523,10 @@ export default function ResumesPage() {
       <Modal
         open={Boolean(selectedResume)}
         onClose={() => setSelectedResume(null)}
-        title={selectedResume?.title ?? ''}
+        title={selectedResume?.title ?? ""}
         description={
           selectedResume
-            ? `${selectedResume.targetRole || 'Engineering Candidate'} • ${selectedResume.content.length.toLocaleString()} characters`
+            ? `${selectedResume.targetRole || "Engineering Candidate"} • ${selectedResume.content.length.toLocaleString()} characters`
             : undefined
         }
         icon={FileText}

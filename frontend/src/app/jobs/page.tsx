@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Briefcase,
   Building2,
@@ -11,14 +11,14 @@ import {
   Plus,
   Sparkles,
   Trash2,
-} from 'lucide-react';
-import { api, getApiErrorMessage } from '@/lib/api';
+} from "lucide-react";
+import { api, getApiErrorMessage } from "@/lib/api";
 import {
   ApiResponse,
   ExperienceLevel,
   JobDescription,
   JobDescriptionSummary,
-} from '@/types';
+} from "@/types";
 import {
   Badge,
   CardSkeleton,
@@ -26,8 +26,8 @@ import {
   EmptyState,
   Modal,
   useToast,
-} from '@/components/ui';
-import { createJobSchema } from '@/schemas/job.schema';
+} from "@/components/ui";
+import { createJobSchema } from "@/schemas/job.schema";
 
 const SAMPLE_JOB_TEXT = `FinTech Innovators Inc. - Junior Full-Stack Developer
 Location: Remote (US / EMEA) | Full-time | Experience: 1-3 years
@@ -56,10 +56,16 @@ PREFERRED QUALIFICATIONS (BONUS)
 - Experience with Redis caching or message queues.
 - Bachelor's degree in Computer Science or equivalent practical engineering experience.`;
 
-const EXPERIENCE_LEVELS: ExperienceLevel[] = ['ENTRY', 'JUNIOR', 'MID', 'SENIOR', 'LEAD'];
+const EXPERIENCE_LEVELS: ExperienceLevel[] = [
+  "ENTRY",
+  "JUNIOR",
+  "MID",
+  "SENIOR",
+  "LEAD",
+];
 
 const inputBase =
-  'block w-full rounded-lg border bg-white/5 px-3.5 py-2 text-sm text-white placeholder:text-neutral-500 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500';
+  "block w-full rounded-lg border bg-white/5 px-3.5 py-2 text-sm text-white placeholder:text-neutral-500 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500";
 
 export default function JobsPage() {
   const toast = useToast();
@@ -76,10 +82,10 @@ export default function JobsPage() {
 
   // Form State
   const [formData, setFormData] = useState({
-    title: '',
-    company: '',
-    experienceLevel: 'ENTRY' as ExperienceLevel,
-    rawText: '',
+    title: "",
+    company: "",
+    experienceLevel: "ENTRY" as ExperienceLevel,
+    rawText: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -87,12 +93,14 @@ export default function JobsPage() {
     try {
       setIsLoading(true);
       const response =
-        await api.get<ApiResponse<{ jobs: JobDescriptionSummary[] }>>('/jobs');
+        await api.get<ApiResponse<{ jobs: JobDescriptionSummary[] }>>("/jobs");
       if (response.data.success && response.data.data) {
         setJobs(response.data.data.jobs);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to load job descriptions.'));
+      toast.error(
+        getApiErrorMessage(error, "Failed to load job descriptions."),
+      );
     } finally {
       setIsLoading(false);
     }
@@ -104,10 +112,10 @@ export default function JobsPage() {
 
   const handleOpenCreateModal = () => {
     setFormData({
-      title: '',
-      company: '',
-      experienceLevel: 'ENTRY',
-      rawText: '',
+      title: "",
+      company: "",
+      experienceLevel: "ENTRY",
+      rawText: "",
     });
     setFieldErrors({});
     setIsModalOpen(true);
@@ -128,7 +136,7 @@ export default function JobsPage() {
         setSelectedJob(response.data.data.job);
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to load job description.'));
+      toast.error(getApiErrorMessage(error, "Failed to load job description."));
     } finally {
       setIsViewLoading(false);
     }
@@ -136,9 +144,9 @@ export default function JobsPage() {
 
   const handleLoadSample = () => {
     setFormData({
-      title: 'Junior Full-Stack Developer',
-      company: 'FinTech Innovators Inc.',
-      experienceLevel: 'JUNIOR',
+      title: "Junior Full-Stack Developer",
+      company: "FinTech Innovators Inc.",
+      experienceLevel: "JUNIOR",
       rawText: SAMPLE_JOB_TEXT,
     });
     setFieldErrors({});
@@ -164,16 +172,16 @@ export default function JobsPage() {
     setIsSubmitting(true);
     try {
       const response = await api.post<ApiResponse<{ job: JobDescription }>>(
-        '/jobs',
+        "/jobs",
         validationResult.data,
       );
       if (response.data.success && response.data.data?.job) {
-        toast.success('Job description saved successfully!');
+        toast.success("Job description saved successfully!");
         handleCloseModal();
         fetchJobs();
       }
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Failed to save job description.'));
+      toast.error(getApiErrorMessage(error, "Failed to save job description."));
     } finally {
       setIsSubmitting(false);
     }
@@ -186,7 +194,7 @@ export default function JobsPage() {
     setDeletingId(id);
     try {
       await api.delete(`/jobs/${id}`);
-      toast.success('Job description deleted successfully.');
+      toast.success("Job description deleted successfully.");
       if (selectedJob?.id === id) {
         setSelectedJob(null);
       }
@@ -194,7 +202,7 @@ export default function JobsPage() {
       fetchJobs();
     } catch (error) {
       toast.error(
-        getApiErrorMessage(error, 'Failed to delete job description.'),
+        getApiErrorMessage(error, "Failed to delete job description."),
       );
     } finally {
       setDeletingId(null);
@@ -206,16 +214,16 @@ export default function JobsPage() {
 
   const getLevelVariant = (level: ExperienceLevel) => {
     switch (level) {
-      case 'ENTRY':
-      case 'JUNIOR':
-        return 'info';
-      case 'MID':
-        return 'success';
-      case 'SENIOR':
-      case 'LEAD':
-        return 'purple';
+      case "ENTRY":
+      case "JUNIOR":
+        return "info";
+      case "MID":
+        return "success";
+      case "SENIOR":
+      case "LEAD":
+        return "purple";
       default:
-        return 'default';
+        return "default";
     }
   };
 
@@ -229,7 +237,7 @@ export default function JobsPage() {
               Target Job Postings
             </h1>
             <Badge variant="matched" size="sm">
-              {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'}
+              {jobs.length} {jobs.length === 1 ? "Job" : "Jobs"}
             </Badge>
           </div>
           <p className="mt-1 text-sm text-neutral-400">
@@ -285,7 +293,10 @@ export default function JobsPage() {
                 <div>
                   {/* Top Badges */}
                   <div className="mb-3 flex items-center justify-between gap-2">
-                    <Badge variant={getLevelVariant(job.experienceLevel)} size="sm">
+                    <Badge
+                      variant={getLevelVariant(job.experienceLevel)}
+                      size="sm"
+                    >
                       {job.experienceLevel}
                     </Badge>
 
@@ -375,7 +386,7 @@ export default function JobsPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4 p-2" noValidate>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Title */}
             <div>
@@ -391,12 +402,14 @@ export default function JobsPage() {
                 placeholder="e.g. Junior Full-Stack Developer"
                 className={`${inputBase} ${
                   fieldErrors.title
-                    ? 'border-rose-400/60 bg-rose-500/10'
-                    : 'border-white/10'
+                    ? "border-rose-400/60 bg-rose-500/10"
+                    : "border-white/10"
                 }`}
               />
               {fieldErrors.title && (
-                <p className="mt-1 text-xs text-rose-300">{fieldErrors.title}</p>
+                <p className="mt-1 text-xs text-rose-300">
+                  {fieldErrors.title}
+                </p>
               )}
             </div>
 
@@ -414,8 +427,8 @@ export default function JobsPage() {
                 placeholder="e.g. Stripe, FinTech Innovators"
                 className={`${inputBase} ${
                   fieldErrors.company
-                    ? 'border-rose-400/60 bg-rose-500/10'
-                    : 'border-white/10'
+                    ? "border-rose-400/60 bg-rose-500/10"
+                    : "border-white/10"
                 }`}
               />
               {fieldErrors.company && (
@@ -441,8 +454,8 @@ export default function JobsPage() {
                   }
                   className={`cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     formData.experienceLevel === level
-                      ? 'border-blue-600 bg-blue-600 text-white shadow-2xs'
-                      : 'border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10'
+                      ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
+                      : "border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10"
                   }`}
                 >
                   {level}
@@ -461,14 +474,14 @@ export default function JobsPage() {
               <span
                 className={`font-mono text-xs font-medium ${
                   charCount === 0
-                    ? 'text-neutral-500'
+                    ? "text-neutral-500"
                     : isContentValid
-                      ? 'text-emerald-400'
-                      : 'text-rose-400'
+                      ? "text-emerald-400"
+                      : "text-rose-400"
                 }`}
               >
-                {charCount.toLocaleString()} / 20,000 characters{' '}
-                {charCount > 0 && charCount < 100 && '(min 100 required)'}
+                {charCount.toLocaleString()} / 20,000 characters{" "}
+                {charCount > 0 && charCount < 100 && "(min 100 required)"}
               </span>
             </div>
             <textarea
@@ -480,8 +493,8 @@ export default function JobsPage() {
               placeholder="Paste the full job requirements, tech stack keywords, and responsibilities here..."
               className={`${inputBase} font-mono text-xs ${
                 fieldErrors.rawText
-                  ? 'border-rose-400/60 bg-rose-500/10'
-                  : 'border-white/10'
+                  ? "border-rose-400/60 bg-rose-500/10"
+                  : "border-white/10"
               }`}
             />
             {fieldErrors.rawText && (
@@ -525,7 +538,7 @@ export default function JobsPage() {
       <Modal
         open={Boolean(selectedJob)}
         onClose={() => setSelectedJob(null)}
-        title={selectedJob?.title ?? ''}
+        title={selectedJob?.title ?? ""}
         description={
           selectedJob
             ? `${selectedJob.company} • ${selectedJob.experienceLevel} Level • ${selectedJob.rawText.length.toLocaleString()} characters`

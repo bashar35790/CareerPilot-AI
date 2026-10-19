@@ -587,7 +587,7 @@ export default function RoadmapsPage() {
         tone="blue"
         size="md"
       >
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4 p-2" noValidate>
           {isLoadingAnalyses ? (
             <TimelineSkeleton />
           ) : analyses.length === 0 ? (
